@@ -4,13 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="color-scheme" content="dark light">
-<link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#007acc">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>HTML Editor Pro v16</title>
+<title>NR Edit Pro</title>
 <style>
   :root{
     --bg:#ffffff; --text:#333; --muted:#8a8a8a;
@@ -219,6 +218,38 @@
     .mobile-tabs{display:flex}
   }
 </style>
+<script>
+/* === PWA RUNTIME: manifest + ikon di-inject via JS (anti rusak) === */
+(function(){
+  var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#3b9dff'/><stop offset='1' stop-color='#0b5bd0'/></linearGradient></defs><rect width='128' height='128' rx='30' fill='url(#g)'/><path d='M32 48 L18 64 L32 80' stroke='#9fd4ff' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M96 48 L110 64 L96 80' stroke='#9fd4ff' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/><text x='64' y='83' font-family='Arial,Helvetica,sans-serif' font-size='54' font-weight='800' fill='#fff' text-anchor='middle'>NR</text></svg>";
+  var icon='data:image/svg+xml,'+encodeURIComponent(svg);
+  var base=location.origin+location.pathname.replace(/[^/]*$/,'');
+  var man={
+    name:'NR Edit Pro — HTML Editor & Previewer',
+    short_name:'NR Edit Pro',
+    description:'Editor HTML offline dengan live preview, simulasi device HP/PC, dan screenshot.',
+    id:'./',
+    start_url:base+'index.html',
+    scope:base,
+    display:'standalone',
+    orientation:'any',
+    lang:'id',
+    background_color:'#1e1e1e',
+    theme_color:'#007acc',
+    icons:[
+      {src:icon,sizes:'any',type:'image/svg+xml',purpose:'any'},
+      {src:icon,sizes:'192x192 512x512',type:'image/svg+xml',purpose:'maskable'}
+    ]
+  };
+  var l=document.createElement('link');
+  l.rel='manifest';
+  l.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(man));
+  document.head.appendChild(l);
+  var f=document.createElement('link');
+  f.rel='icon';f.type='image/svg+xml';f.href=icon;
+  document.head.appendChild(f);
+})();
+</script>
 </head>
 <body>
 
