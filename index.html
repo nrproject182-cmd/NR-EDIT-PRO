@@ -253,8 +253,10 @@
 <div id="burger" class="menu">
   <button onclick="bm('files')"><svg class="ic"><use href="#i-folder" xlink:href="#i-folder"/></svg>File Tersimpan</button>
   <button onclick="bm('new')"><svg class="ic"><use href="#i-plus" xlink:href="#i-plus"/></svg>File Baru</button>
+  <button onclick="bm('upload')"><svg class="ic"><use href="#i-folder" xlink:href="#i-folder"/></svg>Upload HTML</button>
   <div class="sep"></div>
   <button onclick="bm('save')"><svg class="ic"><use href="#i-save" xlink:href="#i-save"/></svg>Simpan</button>
+  <button onclick="bm('saveas')"><svg class="ic"><use href="#i-save" xlink:href="#i-save"/></svg>Save As...</button>
   <button onclick="bm('split')"><svg class="ic"><use href="#i-copy" xlink:href="#i-copy"/></svg>Copy Bertahap</button>
   <button onclick="bm('theme')"><svg class="ic"><use id="bm-theme-ic" href="#i-monitor" xlink:href="#i-monitor"/></svg>Tema: <span id="bm-theme">Auto</span></button>
   <button id="bm-upd" class="hidden" onclick="bm('upd')"><svg class="ic"><use href="#i-alert" xlink:href="#i-alert"/></svg>Update tersedia: <span id="bm-updver"></span></button>
@@ -373,6 +375,7 @@
     <div class="dlg-btns"><button id="dlg-cancel" class="dlg-btn">Batal</button><button id="dlg-ok" class="dlg-btn primary">OK</button></div>
   </div>
 </div>
+<input type="file" id="file-picker" accept=".html,.htm,.txt" style="display:none">
 <div id="toast"></div>
 <script>
 var APP_VERSION='1.1.0';
@@ -724,9 +727,52 @@ function renderFiles(){
 function openFiles(){renderFiles();filesOverlay.classList.remove('hidden');}
 function closeFiles(){filesOverlay.classList.add('hidden');}
 function saveNow(){clearTimeout(histTimer);snapshot();files[curName]=ta.value;persistFiles(false);}
+/* ===== UPLOAD FILE HTML (v31) ===== */
+function uploadFile(){
+  var picker=document.getElementById('file-picker');
+  picker.value='';
+  picker.onchange=function(){
+    var f=this.files[0];
+    if(!f)return;
+    var max=2*1024*1024;
+    if(f.size>max){toast('⚠️ File terlalu besar (max 2MB)');return;}
+    var r=new FileReader();
+    r.onload=function(e){
+      var name=f.name;
+      if(!/\.(html|htm|txt)$/i.test(name))name+='.html';
+      /* simpan file aktif dulu */
+      files[curName]=ta.value;
+      /* kalau nama udah ada, pake itu; kalau belum, bikin baru */
+      files[name]=e.target.result;
+      curName=name;
+      ta.value=e.target.result;
+      fnameEl.textContent=name;
+      lsSet(K_CUR,curName);
+      resetHist();refreshAll();
+      persistFiles(true);
+      toast('📤 Uploaded: '+name+' ('+f.size+' bytes)');
+    };
+    r.onerror=function(){toast('⚠️ Gagal baca file');};
+    r.readAsText(f,'UTF-8');
+  };
+  picker.click();
+}
+/* ===== SAVE AS (v31) ===== */
+function saveAs(){
+  nrPrompt('Simpan sebagai file baru:','copy-of-'+curName,function(nn){
+    if(files.hasOwnProperty(nn)){toast('Nama "'+nn+'" sudah ada');return;}
+    files[curName]=ta.value;
+    files[nn]=ta.value;
+    curName=nn;
+    fnameEl.textContent=nn;
+    lsSet(K_CUR,curName);
+    persistFiles(false);
+    toast('💾 Tersimpan sebagai: '+nn);
+  },{title:'Save As',ok:'Simpan'});
+}
 function toggleBurger(ev){if(ev)ev.stopPropagation();burgerEl.classList.toggle('open');}
 function closeBurger(){burgerEl.classList.remove('open');}
-function bm(a){closeBurger();if(a==='files')openFiles();else if(a==='new')newFile();else if(a==='save')saveNow();else if(a==='theme')cycleTheme();else if(a==='upd')forceUpdate();else if(a==='split')openSplit();}
+function bm(a){closeBurger();if(a==='files')openFiles();else if(a==='new')newFile();else if(a==='save')saveNow();else if(a==='saveas')saveAs();else if(a==='upload')uploadFile();else if(a==='theme')cycleTheme();else if(a==='upd')forceUpdate();else if(a==='split')openSplit();}
 document.addEventListener('click',function(e){if(burgerEl.classList.contains('open')&&!burgerEl.contains(e.target))closeBurger();});
 function readVer(obj){for(var k in obj){if(k.replace(/\s/g,'')==='version')return String(obj[k]).trim();}return null;}
 function verGt(a,b){var pa=a.split('.'),pb=b.split('.'),i,x,y;for(i=0;i<3;i++){x=parseInt(pa[i],10)||0;y=parseInt(pb[i],10)||0;if(x>y)return true;if(x<y)return false;}return false;}
@@ -855,7 +901,7 @@ function bindHold(btn,dir,jumpFn){
   btn.addEventListener('mouseleave',cancel);
 }
 /* ===== COPY BERTAHAP ===== */
-var SPLIT_MAX=20000,splitChunks=[],splitIdx=0;
+var SPLIT_MAX=130000,splitChunks=[],splitIdx=0;
 function openSplit(){
   var s=ta.selectionStart,e=ta.selectionEnd;
   var text=(e>s)?ta.value.slice(s,e):ta.value;
