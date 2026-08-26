@@ -49,10 +49,12 @@
   .editor-pane{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);min-width:0;min-height:0;position:relative}
   .preview-pane{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--panel2)}
   .pv-bar{display:flex;gap:6px;align-items:center;padding:6px 8px;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto}
-  .pv-bar button{width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-  .pv-bar button:active{opacity:.7}
-  .pv-bar button.on{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
-  .pv-bar button svg.ic{width:14px;height:14px}
+  /* v1.1.4: :not(.dev-btn) biar tombol device gak gepeng 30px (fix icon mencong) */
+  .pv-bar button:not(.dev-btn){width:30px;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+  .pv-bar button:not(.dev-btn):active{opacity:.7}
+  .pv-bar button:not(.dev-btn).on{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+  .pv-bar button:not(.dev-btn) svg.ic{width:14px;height:14px}
+  .pv-bar .dev-btn{height:30px}
   #pv-info{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto;padding-right:2px}
   .dev-btn{display:flex;align-items:center;gap:6px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:11px;font-weight:600;cursor:pointer;max-width:190px;flex-shrink:0}
   .dev-btn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -62,7 +64,8 @@
   .dev-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
   .dev-head h2{font-size:14px;font-weight:600}
   .dev-list{overflow-y:auto;padding:6px;-webkit-overflow-scrolling:touch}
-  .dev-group{margin:8px 4px 4px;padding:6px 12px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;border-radius:6px;display:flex;align-items:center;gap:8px}
+  .dev-group{margin:8px 4px 4px;padding:6px 12px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;border-radius:6px;display:flex;align-items:center;gap:8px;line-height:1.2}
+  .g-ic{font-size:12px;line-height:1;transform:translateY(-1px)}
   .dev-group-HP{background:rgba(0,122,204,.12);color:#0078d7;border-left:3px solid #0078d7}
   .dev-group-TABLET{background:rgba(16,185,129,.12);color:#059669;border-left:3px solid #10b981}
   .dev-group-PC{background:rgba(245,158,11,.12);color:#d97706;border-left:3px solid #f59e0b}
@@ -262,7 +265,7 @@
   <button onclick="bm('theme')"><svg class="ic"><use id="bm-theme-ic" href="#i-monitor" xlink:href="#i-monitor"/></svg>Tema: <span id="bm-theme">Auto</span></button>
   <button id="bm-upd" class="hidden" onclick="bm('upd')"><svg class="ic"><use href="#i-alert" xlink:href="#i-alert"/></svg>Update tersedia: <span id="bm-updver"></span></button>
   <div class="sep"></div>
-  <div class="ver-row"><span>NR Edit Pro</span><b id="bm-vernum">v1.1.2</b></div>
+  <div class="ver-row"><span>NR Edit Pro</span><b id="bm-vernum">v1.1.4</b></div>
 </div>
 <div class="container">
   <div class="editor-pane" id="pane-edit">
@@ -379,7 +382,7 @@
 <input type="file" id="file-picker" accept=".html,.htm,.txt" style="display:none">
 <div id="toast"></div>
 <script>
-var APP_VERSION='1.1.2';
+var APP_VERSION='1.1.4';
 var BLANK_GIF='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 var boot=document.getElementById('boot');
 window.onerror=function(m,u,l){var msg='⚠️ '+m+' (baris '+l+')';if(boot&&boot.parentNode&&boot.style.display!=='none'){boot.innerHTML='<div class="boot-err">'+msg+'<br>Coba muat ulang halaman.</div>';}else{toast(msg);}};
@@ -514,7 +517,7 @@ function buildDevList(){
   var html='',lastG='',GIC={'HP':'📱','TABLET':'📟','PC':'🖥️'};
   for(var i=0;i<DEVICES.length;i++){
     var d=DEVICES[i];
-    if(d.group!==lastG){html+='<div class="dev-group dev-group-'+d.group+'">'+(GIC[d.group]||'•')+' '+d.group+'</div>';lastG=d.group;}
+    if(d.group!==lastG){html+='<div class="dev-group dev-group-'+d.group+'"><span class="g-ic">'+(GIC[d.group]||'•')+'</span>'+d.group+'</div>';lastG=d.group;}
     html+='<button class="dev-row'+(d.id===curDevId?' on':'')+'" onclick="pickDev(\''+d.id+'\')"><span>'+d.name+'</span><span class="dim">'+d.w+'×'+d.h+(d.id===curDevId?' ✓':'')+'</span></button>';
   }
   devList.innerHTML=html;
@@ -747,10 +750,24 @@ function bm(a){closeBurger();if(a==='files')openFiles();else if(a==='new')newFil
 document.addEventListener('click',function(e){if(burgerEl.classList.contains('open')&&!burgerEl.contains(e.target))closeBurger();});
 function readVer(obj){for(var k in obj){if(k.replace(/\s/g,'')==='version')return String(obj[k]).trim();}return null;}
 function verGt(a,b){var pa=a.split('.'),pb=b.split('.'),i,x,y;for(i=0;i<3;i++){x=parseInt(pa[i],10)||0;y=parseInt(pb[i],10)||0;if(x>y)return true;if(x<y)return false;}return false;}
+/* v1.1.4: UPDATE OTOMATIS — gak perlu klik, dengan pengaman anti-loop reload */
+function autoUpdate(sv){
+  var tried=null;
+  try{tried=sessionStorage.getItem('nr_upd_tried');}catch(e){}
+  if(tried===sv)return;
+  try{sessionStorage.setItem('nr_upd_tried',sv);}catch(e){}
+  toast('🔄 Update v'+sv+' — memuat otomatis…');
+  setTimeout(forceUpdate,700);
+}
 function checkVersion(){
   try{fetch('version.json?'+Date.now()).then(function(r){return r.json();}).then(function(v){
     var sv=readVer(v);
-    if(sv&&verGt(sv,APP_VERSION)){document.getElementById('upd-dot').classList.remove('hidden');document.getElementById('bm-upd').classList.remove('hidden');document.getElementById('bm-updver').textContent='v'+sv;}
+    if(sv&&verGt(sv,APP_VERSION)){
+      document.getElementById('upd-dot').classList.remove('hidden');
+      document.getElementById('bm-upd').classList.remove('hidden');
+      document.getElementById('bm-updver').textContent='v'+sv;
+      autoUpdate(sv);
+    }
   }).catch(function(){});}catch(e){}
 }
 function forceUpdate(){toast('🔄 Memuat versi terbaru…');try{if(navigator.serviceWorker&&navigator.serviceWorker.controller)navigator.serviceWorker.controller.postMessage('SKIP_WAITING');}catch(e){}setTimeout(function(){location.reload();},400);}
@@ -860,6 +877,7 @@ function bindHold(btn,dir,jumpFn){
   btn.addEventListener('mouseup',up);
   btn.addEventListener('mouseleave',cancel);
 }
+/* v1.1.4: limit copy bertahap 130.000 karakter */
 var SPLIT_MAX=130000,splitChunks=[],splitIdx=0;
 function openSplit(){
   var s=ta.selectionStart,e=ta.selectionEnd;
@@ -948,7 +966,7 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').then(function(reg){
       reg.addEventListener('updatefound',function(){
         var nw=reg.installing;
-        nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller)toast('🔄 Update terdeteksi — buka burger menu → "Update tersedia"');});
+        nw.addEventListener('statechange',function(){if(nw.state==='installed'&&navigator.serviceWorker.controller)toast('🔄 Update terdeteksi — memuat otomatis…');});
       });
     }).catch(function(){});
   });
