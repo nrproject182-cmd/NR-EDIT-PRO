@@ -1,0 +1,32 @@
+{
+  "name": "NR Edit Pro — HTML Editor & Previewer",
+  "short_name": "NR Edit Pro",
+  "description": "Editor HTML offline dengan live preview, simulasi device HP/PC, dan screenshot.",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "id",
+  "background_color": "#1e1e1e",
+  "theme_color": "#007acc",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
