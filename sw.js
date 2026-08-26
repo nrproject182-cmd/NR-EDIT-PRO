@@ -1,5 +1,5 @@
-/* NR Edit Pro — Service Worker v1.0.5 */
-var VERSION = '1.0.5';
+/* NR Edit Pro — Service Worker v1.0.6 */
+var VERSION = '1.0.6';
 var CACHE = 'nr-edit-pro-' + VERSION;
 var CORE = ['./', './index.html'];
 
