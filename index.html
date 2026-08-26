@@ -219,10 +219,10 @@
   }
 </style>
 <script>
-/* === PWA RUNTIME: manifest + ikon di-inject via JS (anti rusak) === */
+/* === PWA RUNTIME v3: pake icon-192.png & icon-512.png yang udah ada di repo === */
 (function(){
   var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#3b9dff'/><stop offset='1' stop-color='#0b5bd0'/></linearGradient></defs><rect width='128' height='128' rx='30' fill='url(#g)'/><path d='M32 48 L18 64 L32 80' stroke='#9fd4ff' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M96 48 L110 64 L96 80' stroke='#9fd4ff' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/><text x='64' y='83' font-family='Arial,Helvetica,sans-serif' font-size='54' font-weight='800' fill='#fff' text-anchor='middle'>NR</text></svg>";
-  var icon='data:image/svg+xml,'+encodeURIComponent(svg);
+  var iconSvg='data:image/svg+xml,'+encodeURIComponent(svg);
   var base=location.origin+location.pathname.replace(/[^/]*$/,'');
   var man={
     name:'NR Edit Pro — HTML Editor & Previewer',
@@ -234,11 +234,13 @@
     display:'standalone',
     orientation:'any',
     lang:'id',
-    background_color:'#1e1e1e',
-    theme_color:'#007acc',
+    background_color:'#0d1220',
+    theme_color:'#0d1220',
     icons:[
-      {src:icon,sizes:'any',type:'image/svg+xml',purpose:'any'},
-      {src:icon,sizes:'192x192 512x512',type:'image/svg+xml',purpose:'maskable'}
+      {src:base+'icon-512.png',sizes:'512x512',type:'image/png',purpose:'any'},
+      {src:base+'icon-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'},
+      {src:base+'icon-192.png',sizes:'192x192',type:'image/png',purpose:'any'},
+      {src:iconSvg,sizes:'any',type:'image/svg+xml',purpose:'any'}
     ]
   };
   var l=document.createElement('link');
@@ -246,8 +248,11 @@
   l.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(man));
   document.head.appendChild(l);
   var f=document.createElement('link');
-  f.rel='icon';f.type='image/svg+xml';f.href=icon;
+  f.rel='icon';f.type='image/png';f.href=base+'icon-192.png';
   document.head.appendChild(f);
+  var a=document.createElement('link');
+  a.rel='apple-touch-icon';a.href=base+'icon-192.png';
+  document.head.appendChild(a);
 })();
 </script>
 </head>
