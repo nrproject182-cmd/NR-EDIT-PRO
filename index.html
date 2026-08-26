@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="color-scheme" content="dark light">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#007acc">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,6 +17,7 @@
     --gutter-bg:#fafafa; --gutter-text:#999;
     --caret:#000; --selbg:rgba(0,120,215,.25);
     --mark-bg:#ffd76b; --mark-fg:#000;
+    --danger:#e5534b;
     --shadow:0 4px 16px rgba(0,0,0,.15);
     --c-tag:#800000; --c-attr:#e50000; --c-str:#a31515; --c-com:#008000;
     --c-kw:#0000ff; --c-num:#098658; --c-sel:#800000; --c-prop:#ff0000;
@@ -60,10 +60,19 @@
   svg.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
   button{font-family:inherit}
 
+  /* v19: CSS force rotate — paksa app landscape di viewer yang gak support orientation lock */
+  body.force-landscape{
+    top:0 !important;left:0 !important;right:auto !important;bottom:auto !important;
+    width:100vh !important;height:100vw !important;
+    transform-origin:top left !important;
+    transform:rotate(90deg) translateY(-100%) !important;
+    overflow:hidden !important;
+  }
+
   #boot{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);font-size:13px}
   .spin{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite}
   @keyframes sp{to{transform:rotate(360deg)}}
-  .boot-err{color:#e5534b;text-align:center;padding:0 24px;line-height:1.6}
+  .boot-err{color:var(--danger);text-align:center;padding:0 24px;line-height:1.6}
 
   header{height:48px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 12px;flex-shrink:0;gap:4px}
   .brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
@@ -73,19 +82,20 @@
   .titles h1{font-size:13px;font-weight:600;letter-spacing:.2px;white-space:nowrap}
   #fname{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
   .hdr-actions{display:flex;align-items:center;gap:2px;flex-shrink:0}
-  .hdr-btn{width:36px;height:36px;border:none;border-radius:6px;background:transparent;color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+  .hdr-btn{position:relative;width:36px;height:36px;border:none;border-radius:6px;background:transparent;color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
   .hdr-btn:active{background:var(--panel2)}
+  .upd-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 2px var(--panel)}
 
-  .menu{position:fixed;top:50px;right:8px;z-index:170;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);display:none;min-width:190px;overflow:hidden;padding:4px}
+  .menu{position:fixed;top:50px;right:8px;z-index:170;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);display:none;min-width:200px;overflow:hidden;padding:4px}
   .menu.open{display:block}
   .menu button{display:flex;gap:10px;align-items:center;width:100%;border:none;background:transparent;color:var(--text);padding:11px 12px;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;text-align:left}
   .menu button:active{background:var(--panel2)}
   .menu button svg.ic{width:15px;height:15px;color:var(--muted)}
   .menu .sep{height:1px;background:var(--border);margin:4px 8px}
-
-  .mobile-tabs{display:none;height:38px;background:var(--panel);border-bottom:1px solid var(--border)}
-  .mobile-tabs button{flex:1;border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer;text-transform:uppercase}
-  .mobile-tabs button.active{color:var(--accent);box-shadow:inset 0 -2px 0 var(--accent)}
+  .ver-row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;font-size:10.5px;color:var(--muted)}
+  .ver-row b{color:var(--text);font-weight:600}
+  #bm-upd{color:var(--accent)!important;font-weight:600!important}
+  #bm-upd svg.ic{color:var(--accent)!important}
 
   .container{flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0}
   .editor-pane{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);min-width:0;min-height:0;position:relative}
@@ -108,6 +118,9 @@
   #pv-gesture.on{display:block}
   #zoom-chip{position:absolute;bottom:10px;left:10px;z-index:7;display:none;background:rgba(0,0,0,.55);color:#fff;font-size:10px;font-weight:600;padding:4px 10px;border-radius:12px;pointer-events:none;letter-spacing:.3px}
   #zoom-chip.on{display:block}
+  #pv-back{display:none;position:absolute;bottom:14px;right:10px;z-index:8;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--panel);color:var(--text);align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow)}
+  #pv-back:active{background:var(--accent);color:var(--accent-text)}
+  #pv-back svg.ic{width:17px;height:17px}
 
   .editor-wrap{flex:1;display:flex;overflow:hidden;min-height:0}
   .gutter{width:48px;overflow:hidden;background:var(--gutter-bg);color:var(--gutter-text);text-align:right;border-right:1px solid var(--border);flex-shrink:0}
@@ -152,11 +165,11 @@
   .bottombar button.dis{opacity:.3}
 
   body.fs-on header,
-  body.fs-on .mobile-tabs,
   body.fs-on .statusbar,
   body.fs-on .bottombar,
   body.fs-on .pv-bar,
-  body.fs-on #fnbar{display:none}
+  body.fs-on #fnbar,
+  body.fs-on #pv-back{display:none}
   body.fs-on .preview-wrap{padding:0;background-image:none}
   body.fs-on .editor-pane{border:none}
   body.fs-on #pv-stage{border-radius:0;box-shadow:none}
@@ -166,12 +179,13 @@
   #fs-menu{width:38px;height:38px;border-radius:50%;border:none;background:rgba(128,128,128,.4);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.5;box-shadow:var(--shadow)}
   #fs-menu:active{opacity:1}
   #fs-menu svg.ic{width:16px;height:16px}
-  #fs-actions{display:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--shadow)}
+  #fs-actions{display:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--shadow);flex-wrap:wrap;max-width:92vw}
   #fs-pill.show #fs-actions{display:flex}
   #fs-actions button{border:none;background:transparent;color:var(--text);padding:10px 12px;font-size:11px;font-weight:600;cursor:pointer}
   #fs-actions button+button{border-left:1px solid var(--border)}
   #fs-actions button.on{background:var(--accent);color:var(--accent-text)}
-  #fs-actions button.x{color:#e5534b}
+  #fs-actions button.x{color:var(--danger)}
+  #fs-actions select{border:none;background:var(--panel2);color:var(--text);padding:9px 6px;font-size:11px;font-weight:600;max-width:170px;outline:none;border-left:1px solid var(--border)}
 
   .findbar{position:fixed;top:0;left:0;right:0;z-index:70;display:none;background:var(--panel);border-bottom:1px solid var(--border);padding:8px 10px;flex-direction:column;gap:6px;box-shadow:var(--shadow)}
   .findbar.open{display:flex}
@@ -202,12 +216,22 @@
   .f-name .cur{color:var(--accent)}
   .files-foot{padding:10px;border-top:1px solid var(--border)}
   .files-foot button{width:100%;background:var(--accent);color:var(--accent-text);border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
-  .paste-body{padding:12px}
-  .paste-hint{font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5}
-  .paste-area{width:100%;height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font:13px/1.5 Consolas,Monaco,"Courier New",monospace;resize:none}
-  .paste-area:focus{border-color:var(--accent)}
-  .paste-btns{display:flex;gap:8px;margin-top:10px}
-  .paste-btns .fb-btn{flex:1;justify-content:center;padding:9px}
+
+  .dlg-panel{width:100%;max-width:340px;background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  .dlg-head{display:flex;align-items:center;gap:10px;padding:16px 16px 0}
+  .dlg-ic{width:34px;height:34px;border-radius:10px;background:var(--accent);color:var(--accent-text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .dlg-ic.danger{background:var(--danger)}
+  .dlg-ic svg.ic{width:16px;height:16px}
+  .dlg-head h2{font-size:14px;font-weight:600}
+  .dlg-body{padding:12px 16px 4px}
+  .dlg-body p{font-size:12.5px;color:var(--muted);line-height:1.55;white-space:pre-line}
+  .dlg-input{width:100%;margin-top:10px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:13px}
+  .dlg-input:focus{border-color:var(--accent)}
+  .dlg-btns{display:flex;justify-content:flex-end;gap:8px;padding:14px 16px}
+  .dlg-btn{border:1px solid var(--border);background:transparent;color:var(--text);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer}
+  .dlg-btn:active{opacity:.75}
+  .dlg-btn.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+  .dlg-btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
   .hidden{display:none!important}
 
   #toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:var(--panel2);color:var(--text);border:1px solid var(--border);font-size:12px;padding:7px 16px;border-radius:20px;box-shadow:var(--shadow);display:none;z-index:99;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis}
@@ -215,11 +239,12 @@
   @media (max-width:768px){
     .container{flex-direction:column}
     .editor-pane{border-right:none;border-bottom:1px solid var(--border)}
-    .mobile-tabs{display:flex}
+    body.tab-preview:not(.fs-on) .bottombar{display:none}
+    body.tab-preview:not(.fs-on) #pv-back{display:flex}
   }
 </style>
 <script>
-/* === PWA RUNTIME v3: pake icon-192.png & icon-512.png yang udah ada di repo === */
+/* === PWA RUNTIME v4: manifest + ikon PNG neon inline (anti rusak) === */
 (function(){
   var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#3b9dff'/><stop offset='1' stop-color='#0b5bd0'/></linearGradient></defs><rect width='128' height='128' rx='30' fill='url(#g)'/><path d='M32 48 L18 64 L32 80' stroke='#9fd4ff' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/><path d='M96 48 L110 64 L96 80' stroke='#9fd4ff' stroke-width='9' fill='none' stroke-linecap='round' stroke-linejoin='round'/><text x='64' y='83' font-family='Arial,Helvetica,sans-serif' font-size='54' font-weight='800' fill='#fff' text-anchor='middle'>NR</text></svg>";
   var iconSvg='data:image/svg+xml,'+encodeURIComponent(svg);
@@ -227,7 +252,7 @@
   var man={
     name:'NR Edit Pro — HTML Editor & Previewer',
     short_name:'NR Edit Pro',
-    description:'Editor HTML offline dengan live preview, simulasi device HP/PC, dan screenshot.',
+    description:'Editor HTML offline dengan live preview, simulasi device HP/Tablet/PC, dan screenshot.',
     id:'./',
     start_url:base+'index.html',
     scope:base,
@@ -237,9 +262,9 @@
     background_color:'#0d1220',
     theme_color:'#0d1220',
     icons:[
-      {src:base+'icon-512.png',sizes:'512x512',type:'image/png',purpose:'any'},
-      {src:base+'icon-512.png',sizes:'512x512',type:'image/png',purpose:'maskable'},
-      {src:base+'icon-192.png',sizes:'192x192',type:'image/png',purpose:'any'},
+      {src:base+'icon-512.png?v=2',sizes:'512x512',type:'image/png',purpose:'any'},
+      {src:base+'icon-512.png?v=2',sizes:'512x512',type:'image/png',purpose:'maskable'},
+      {src:base+'icon-192.png?v=2',sizes:'192x192',type:'image/png',purpose:'any'},
       {src:iconSvg,sizes:'any',type:'image/svg+xml',purpose:'any'}
     ]
   };
@@ -248,10 +273,10 @@
   l.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(man));
   document.head.appendChild(l);
   var f=document.createElement('link');
-  f.rel='icon';f.type='image/png';f.href=base+'icon-192.png';
+  f.rel='icon';f.type='image/png';f.href=base+'icon-192.png?v=2';
   document.head.appendChild(f);
   var a=document.createElement('link');
-  a.rel='apple-touch-icon';a.href=base+'icon-192.png';
+  a.rel='apple-touch-icon';a.href=base+'icon-192.png?v=2';
   document.head.appendChild(a);
 })();
 </script>
@@ -274,18 +299,21 @@
   <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></symbol>
   <symbol id="i-rotate" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
-  <symbol id="i-paste" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
   <symbol id="i-top" viewBox="0 0 24 24"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></symbol>
   <symbol id="i-bottom" viewBox="0 0 24 24"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
-  <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
   <symbol id="i-max" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></symbol>
   <symbol id="i-min" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></symbol>
   <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
 </svg>
 
 <div id="boot"><div class="spin"></div><div>Memuat editor…</div></div>
@@ -294,7 +322,7 @@
   <div class="brand">
     <div class="logo"><svg class="ic"><use href="#i-code" xlink:href="#i-code"/></svg></div>
     <div class="titles">
-      <h1>HTML Editor Pro</h1>
+      <h1>NR Edit Pro</h1>
       <span id="fname">index.html</span>
     </div>
   </div>
@@ -304,6 +332,7 @@
     </button>
     <button class="hdr-btn" onclick="toggleBurger(event)" title="Menu">
       <svg class="ic"><use href="#i-menu" xlink:href="#i-menu"/></svg>
+      <span id="upd-dot" class="upd-dot hidden"></span>
     </button>
   </div>
 </header>
@@ -314,11 +343,9 @@
   <div class="sep"></div>
   <button onclick="bm('save')"><svg class="ic"><use href="#i-save" xlink:href="#i-save"/></svg>Simpan</button>
   <button onclick="bm('theme')"><svg class="ic"><use id="bm-theme-ic" href="#i-monitor" xlink:href="#i-monitor"/></svg>Tema: <span id="bm-theme">Auto</span></button>
-</div>
-
-<div class="mobile-tabs">
-  <button id="tab-edit" class="active" onclick="switchTab('edit')">Editor</button>
-  <button id="tab-preview" onclick="switchTab('preview')">Preview</button>
+  <button id="bm-upd" class="hidden" onclick="bm('upd')"><svg class="ic"><use href="#i-alert" xlink:href="#i-alert"/></svg>Update tersedia: <span id="bm-updver"></span></button>
+  <div class="sep"></div>
+  <div class="ver-row"><span>NR Edit Pro</span><b id="bm-vernum">v1.0.5</b></div>
 </div>
 
 <div class="container">
@@ -343,12 +370,13 @@
   <div class="preview-pane" id="pane-preview">
     <div class="pv-bar">
       <select id="pv-device"></select>
-      <button onclick="rotatePv()" title="Putar layar"><svg class="ic"><use href="#i-rotate" xlink:href="#i-rotate"/></svg></button>
+      <button id="pv-orient" onclick="toggleOrient()" title="Orientasi"><svg class="ic"><use href="#i-rotate" xlink:href="#i-rotate"/></svg></button>
       <button id="pv-zoom" onclick="toggleZoom()" title="Mode zoom (cubit)"><svg class="ic"><use href="#i-zoom" xlink:href="#i-zoom"/></svg></button>
       <button onclick="screenshotPreview()" title="Screenshot sesuai resolusi emulator"><svg class="ic"><use href="#i-cam" xlink:href="#i-cam"/></svg></button>
       <span id="pv-info">—</span>
     </div>
     <div class="preview-body">
+      <button id="pv-back" onclick="switchTab('edit')" title="Kembali ke editor"><svg class="ic"><use href="#i-back" xlink:href="#i-back"/></svg></button>
       <div class="preview-wrap" id="pv-wrap">
         <div id="pv-sizer">
           <div id="pv-stage">
@@ -382,18 +410,20 @@
 </div>
 
 <div class="bottombar">
-  <button onclick="copyCode()"><svg class="ic"><use href="#i-copy" xlink:href="#i-copy"/></svg><span class="lb">Copy</span></button>
-  <button onclick="pasteCode()"><svg class="ic"><use href="#i-paste" xlink:href="#i-paste"/></svg><span class="lb">Paste</span></button>
+  <button onclick="copyCode()" title="Salin HTML"><svg class="ic"><use href="#i-copy" xlink:href="#i-copy"/></svg><span class="lb">Salin</span></button>
+  <button onclick="clearAll()" title="Hapus semua (kosongkan lembar kerja)"><svg class="ic"><use href="#i-trash" xlink:href="#i-trash"/></svg><span class="lb">Hapus</span></button>
   <button id="btn-undo" onclick="undo()"><svg class="ic"><use href="#i-undo" xlink:href="#i-undo"/></svg><span class="lb">Undo</span></button>
   <button id="btn-redo" onclick="redo()"><svg class="ic"><use href="#i-redo" xlink:href="#i-redo"/></svg><span class="lb">Redo</span></button>
   <button onclick="openFind()"><svg class="ic"><use href="#i-search" xlink:href="#i-search"/></svg><span class="lb">Cari</span></button>
+  <button onclick="runPreview()" title="Jalankan & buka preview"><svg class="ic"><use href="#i-play" xlink:href="#i-play"/></svg><span class="lb">Play</span></button>
 </div>
 
 <div id="fs-pill">
   <div id="fs-actions">
     <button onclick="fsAct('edit')">Editor</button>
     <button onclick="fsAct('preview')">Preview</button>
-    <button onclick="rotatePv()">Putar</button>
+    <select id="fs-device" title="Pilih resolusi device"></select>
+    <button id="fs-orient" onclick="toggleOrient()">Horisontal</button>
     <button id="fs-zoom" onclick="toggleZoom()">Zoom</button>
     <button onclick="screenshotPreview()">📸 Shot</button>
     <button class="x" onclick="toggleFS()">Keluar</button>
@@ -433,19 +463,19 @@
   </div>
 </div>
 
-<div id="paste-overlay" class="overlay hidden">
-  <div class="files-panel" style="max-width:380px">
-    <div class="files-head">
-      <h2>📥 Paste Manual</h2>
-      <button class="fb-btn" onclick="closePaste()"><svg class="ic"><use href="#i-x" xlink:href="#i-x"/></svg></button>
+<div id="dlg-overlay" class="overlay hidden" onclick="if(event.target===this)dlgClose()">
+  <div class="dlg-panel">
+    <div class="dlg-head">
+      <div class="dlg-ic" id="dlg-icbox"><svg class="ic"><use id="dlg-ic-use" href="#i-code" xlink:href="#i-code"/></svg></div>
+      <h2 id="dlg-title">NR Edit Pro</h2>
     </div>
-    <div class="paste-body">
-      <div class="paste-hint">Tekan lama di kotak bawah → pilih <b>Tempel</b>, lalu ketuk <b>Sisipkan</b>. Konten masuk persis di posisi kursor.</div>
-      <textarea id="paste-area" class="paste-area" placeholder="Tempel di sini..."></textarea>
-      <div class="paste-btns">
-        <button class="fb-btn" onclick="closePaste()">Batal</button>
-        <button class="fb-btn on" onclick="doPasteInsert()">Sisipkan</button>
-      </div>
+    <div class="dlg-body">
+      <p id="dlg-msg"></p>
+      <input id="dlg-input" class="dlg-input hidden" autocomplete="off">
+    </div>
+    <div class="dlg-btns">
+      <button id="dlg-cancel" class="dlg-btn">Batal</button>
+      <button id="dlg-ok" class="dlg-btn primary">OK</button>
     </div>
   </div>
 </div>
@@ -453,6 +483,7 @@
 <div id="toast"></div>
 
 <script>
+var APP_VERSION='1.0.5';
 var boot=document.getElementById('boot');
 window.onerror=function(m,u,l){
   var msg='⚠️ '+m+' (baris '+l+')';
@@ -469,6 +500,10 @@ var DEVICES=[
   {id:'m412', group:'HP', name:'Android Large · 412×915',  w:412,  h:915},
   {id:'i375', group:'HP', name:'iPhone SE · 375×667',      w:375,  h:667},
   {id:'i390', group:'HP', name:'iPhone 12 · 390×844',      w:390,  h:844},
+  {id:'t600', group:'TABLET', name:'Tablet 7" · 600×1024', w:600,  h:1024},
+  {id:'t800', group:'TABLET', name:'Tablet 10" · 800×1280',w:800,  h:1280},
+  {id:'ipad', group:'TABLET', name:'iPad · 768×1024',      w:768,  h:1024},
+  {id:'ipadp',group:'TABLET', name:'iPad Pro · 1024×1366', w:1024, h:1366},
   {id:'d1366',group:'PC', name:'Laptop · 1366×768',        w:1366, h:768},
   {id:'d1440',group:'PC', name:'Desktop · 1440×900',       w:1440, h:900},
   {id:'d1920',group:'PC', name:'Full HD · 1920×1080',      w:1920, h:1080}
@@ -485,6 +520,7 @@ var ta=document.getElementById('code'),
     pvSizer=document.getElementById('pv-sizer'),
     pvStage=document.getElementById('pv-stage'),
     pvSel=document.getElementById('pv-device'),
+    fsSel=document.getElementById('fs-device'),
     pvInfo=document.getElementById('pv-info'),
     gEl=document.getElementById('pv-gesture'),
     zoomChip=document.getElementById('zoom-chip'),
@@ -495,8 +531,13 @@ var ta=document.getElementById('code'),
     fbCase=document.getElementById('fb-case'),
     filesOverlay=document.getElementById('files-overlay'),
     filesList=document.getElementById('files-list'),
-    pasteOverlay=document.getElementById('paste-overlay'),
-    pasteArea=document.getElementById('paste-area'),
+    dlgOverlay=document.getElementById('dlg-overlay'),
+    dlgTitle=document.getElementById('dlg-title'),
+    dlgMsg=document.getElementById('dlg-msg'),
+    dlgInput=document.getElementById('dlg-input'),
+    dlgOk=document.getElementById('dlg-ok'),
+    dlgCancel=document.getElementById('dlg-cancel'),
+    dlgIcBox=document.getElementById('dlg-icbox'),
     fnameEl=document.getElementById('fname'),
     burgerEl=document.getElementById('burger'),
     btnUndo=document.getElementById('btn-undo'),
@@ -510,7 +551,8 @@ var ta=document.getElementById('code'),
     files={}, curName='index.html',
     hist=[], hIndex=-1, histTimer=null,
     gCount=-1, toastTimer=null, curTheme='auto',
-    caseSensGlobal=false, curDevId=null, rotated=false, fakeFS=false,
+    caseSensGlobal=false, curDevId=null, fakeFS=false,
+    orientMode='portrait',
     pillTimer=null, pendingBlob=null,
     baseScale=1, userZoom=1, zoomOn=false,
     CW=7.8, LH=20.8, PT=10, PL=12,
@@ -544,7 +586,42 @@ function posToLC(p){
   return {line:lo,col:p-lineStarts[lo]};
 }
 
-/* ========== FIT VIEWPORT + DETEKSI KEYBOARD ========== */
+/* ========== DIALOG CUSTOM ========== */
+var dlgCb=null,dlgIsPrompt=false;
+function dlgOpen(o){
+  dlgTitle.textContent=o.title||'NR Edit Pro';
+  dlgMsg.textContent=o.msg||'';
+  dlgIsPrompt=!!o.prompt;
+  dlgInput.classList.toggle('hidden',!dlgIsPrompt);
+  if(dlgIsPrompt)dlgInput.value=o.def||'';
+  dlgOk.textContent=o.ok||'OK';
+  dlgOk.className='dlg-btn '+(o.danger?'danger':'primary');
+  dlgIcBox.className='dlg-ic'+(o.danger?' danger':'');
+  setUse('dlg-ic-use',o.danger?'i-alert':(o.prompt?'i-edit':'i-code'));
+  dlgCb=o.cb||null;
+  dlgOverlay.classList.remove('hidden');
+  if(dlgIsPrompt)setTimeout(function(){dlgInput.focus();dlgInput.select();},80);
+}
+function dlgClose(){dlgOverlay.classList.add('hidden');dlgCb=null;}
+dlgCancel.onclick=dlgClose;
+dlgOk.onclick=function(){
+  var v=dlgInput.value,cb=dlgCb;
+  dlgClose();
+  if(cb)cb(dlgIsPrompt?v:true);
+};
+dlgInput.addEventListener('keydown',function(e){
+  if(e.key==='Enter'){e.preventDefault();dlgOk.click();}
+});
+function nrConfirm(msg,cb,opt){
+  opt=opt||{};
+  dlgOpen({title:opt.title,msg:msg,ok:opt.ok||'Ya',danger:opt.danger,cb:function(){cb();}});
+}
+function nrPrompt(msg,def,cb,opt){
+  opt=opt||{};
+  dlgOpen({title:opt.title,msg:msg,prompt:true,def:def,ok:opt.ok||'Simpan',cb:function(v){v=v.trim();if(v)cb(v);}});
+}
+
+/* ========== FIT VIEWPORT + KEYBOARD ========== */
 function fitViewport(){
   var vv=window.visualViewport;
   if(!vv)return;
@@ -644,7 +721,7 @@ function drawSearchMarks(){
 }
 var smDeb=debounce(drawSearchMarks,200);
 
-/* ========== JUMP SCROLL SMOOTH ========== */
+/* ========== JUMP SCROLL ========== */
 function animateScrollTo(target){
   var start=ta.scrollTop,diff=target-start,dur=320,t0=null;
   if(!window.requestAnimationFrame||Math.abs(diff)<2){ta.scrollTop=target;syncScroll();return;}
@@ -661,7 +738,7 @@ function animateScrollTo(target){
 function jumpTop(){animateScrollTo(0);}
 function jumpBottom(){animateScrollTo(ta.scrollHeight);}
 
-/* ========== DEVICE SIMULATOR + ZOOM ========== */
+/* ========== DEVICE + ORIENTASI + FORCE ROTATE (v19) ========== */
 function getDev(){
   for(var i=0;i<DEVICES.length;i++)if(DEVICES[i].id===curDevId)return DEVICES[i];
   return null;
@@ -678,14 +755,39 @@ function buildDeviceSelect(){
     html+='<option value="'+d.id+'">'+d.name+'</option>';
   }
   html+='</optgroup>';
-  pvSel.innerHTML=html;
-  pvSel.value=curDevId;
+  pvSel.innerHTML=html;pvSel.value=curDevId;
+  fsSel.innerHTML=html;fsSel.value=curDevId;
+}
+function displayDims(){
+  var d=getDev();if(!d)return null;
+  var w=d.w,h=d.h;
+  var wantL=(orientMode==='landscape');
+  if((w>h)!==wantL){var t=w;w=h;h=t;}
+  return {w:w,h:h};
+}
+function updateOrientUI(){
+  var lbl=(orientMode==='landscape')?'Horisontal':'Vertikal';
+  var b=document.getElementById('fs-orient');if(b)b.textContent=lbl;
+  var p=document.getElementById('pv-orient');if(p)p.title='Orientasi: '+lbl;
+}
+/* v19: paksa app muter via CSS rotate saat fullscreen+landscape (jalan di semua viewer) */
+function applyForceRotate(){
+  var on=fsOn()&&orientMode==='landscape';
+  document.body.classList.toggle('force-landscape',on);
+  setTimeout(function(){fitViewport();layoutPreview();syncScroll();},120);
+  setTimeout(function(){fitViewport();layoutPreview();},400);
+}
+function toggleOrient(){
+  orientMode=(orientMode==='landscape')?'portrait':'landscape';
+  tryLock(orientMode);
+  applyForceRotate();
+  updateOrientUI();
+  layoutPreview();
 }
 function fsOn(){return document.body.classList.contains('fs-on');}
 function applyStage(){
-  var d=getDev();if(!d)return;
-  var w=d.w,h=d.h;
-  if(rotated){w=d.h;h=d.w;}
+  var dm=displayDims();if(!dm)return;
+  var w=dm.w,h=dm.h;
   var s=baseScale*userZoom;
   pvStage.style.width=w+'px';
   pvStage.style.height=h+'px';
@@ -695,9 +797,8 @@ function applyStage(){
   pvInfo.textContent=w+'×'+h+' · '+Math.round(s*100)+'%'+(userZoom!==1?' · 🔍'+userZoom.toFixed(1)+'x':'');
 }
 function layoutPreview(){
-  var d=getDev();if(!d)return;
-  var w=d.w,h=d.h;
-  if(rotated){w=d.h;h=d.w;}
+  var dm=displayDims();if(!dm)return;
+  var w=dm.w,h=dm.h;
   var on=fsOn(),pad=on?0:24,
       wrapW=pvWrap.clientWidth-pad,
       wrapH=pvWrap.clientHeight-pad;
@@ -721,12 +822,19 @@ function setZoom(z,keepCenter){
     pvWrap.scrollTop=cy*r-rect.height/2;
   }
 }
-function rotatePv(){rotated=!rotated;layoutPreview();}
-pvSel.addEventListener('change',function(){
-  curDevId=pvSel.value;rotated=false;userZoom=1;
+function setDevice(id){
+  curDevId=id;userZoom=1;
+  var d=getDev();
+  orientMode=(d&&d.w>d.h)?'landscape':'portrait';
+  tryLock(orientMode);
+  applyForceRotate();
   lsSet(K_PV,curDevId);
+  pvSel.value=curDevId;fsSel.value=curDevId;
+  updateOrientUI();
   layoutPreview();
-});
+}
+pvSel.addEventListener('change',function(){setDevice(pvSel.value);});
+fsSel.addEventListener('change',function(){setDevice(fsSel.value);});
 function toggleZoom(){
   zoomOn=!zoomOn;
   gEl.classList.toggle('on',zoomOn);
@@ -780,7 +888,7 @@ gEl.addEventListener('wheel',function(e){
   setZoom(userZoom*(e.deltaY<0?1.1:0.9),true);
 },{passive:false});
 
-/* ========== SCREENSHOT v16: html2canvas + download data-URL ========== */
+/* ========== SCREENSHOT ========== */
 function saveDataUrl(url,w,h,ext){
   try{
     var a=document.createElement('a');
@@ -793,16 +901,13 @@ function saveDataUrl(url,w,h,ext){
   }catch(e){return false;}
 }
 function screenshotPreview(){
-  var d=getDev();
-  if(!d){toast('Pilih device dulu');return;}
-  var w=d.w,h=d.h;
-  if(rotated){w=d.h;h=d.w;}
+  var dm=displayDims();
+  if(!dm){toast('Pilih device dulu');return;}
+  var w=dm.w,h=dm.h;
   var iwin=null,idoc=null;
   try{iwin=frame.contentWindow;idoc=iwin.document;}catch(e){}
   if(!idoc||!idoc.documentElement){toast('Preview belum siap');return;}
   toast('📸 Merender '+w+'×'+h+'…');
-
-  /* jalur 1: html2canvas (tanpa foreignObject, anti-blokir) */
   function viaH2C(){
     try{
       iwin.html2canvas(idoc.documentElement,{
@@ -816,8 +921,6 @@ function screenshotPreview(){
       }).catch(function(){viaSVG();});
     }catch(e){viaSVG();}
   }
-
-  /* jalur 2 (fallback): foreignObject, download via data-URL */
   function viaSVG(){
     try{
       var clone=idoc.documentElement.cloneNode(true);
@@ -855,7 +958,6 @@ function screenshotPreview(){
         URL.revokeObjectURL(url);
         if(ok){toast('📸 PNG tersimpan '+w+'×'+h);}
         else{
-          /* terakhir: SVG sebagai data-URL (bukan blob) */
           var ok2=saveDataUrl('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg),w,h,'svg');
           toast(ok2?'📸 SVG tersimpan (PNG diblokir)':'⚠️ Download ditolak browser');
         }
@@ -864,7 +966,6 @@ function screenshotPreview(){
       img.src=url;
     }catch(e){toast('⚠️ Screenshot gagal');}
   }
-
   if(iwin.html2canvas){viaH2C();}
   else{
     var s=idoc.createElement('script');
@@ -945,7 +1046,7 @@ function syncScroll(){
 }
 function refreshHighlight(){hl.innerHTML=highlight(ta.value)+'\n';syncScroll();}
 
-/* ========== PREVIEW (Blob URL) ========== */
+/* ========== PREVIEW ========== */
 function updatePreview(){
   var code=ta.value+'';
   var spy="<scr"+"ipt>window.onerror=function(m,u,l){try{parent.postMessage({__hle:1,msg:String(m)+' (baris '+l+')'},'*')}catch(e){}};window.addEventListener('unhandledrejection',function(e){try{parent.postMessage({__hle:1,msg:'Promise: '+((e.reason&&e.reason.message)||e.reason)},'*')}catch(e){}});</scr"+"ipt>";
@@ -1018,6 +1119,17 @@ function redo(){
   updateHistButtons();
 }
 
+/* ========== HAPUS SEMUA ========== */
+function clearAll(){
+  if(!ta.value){toast('Lembar kerja sudah kosong');return;}
+  nrConfirm('Hapus SEMUA isi lembar kerja?\nTenang, masih bisa Undo kalau berubah pikiran.',function(){
+    ta.value='';
+    onInput();
+    snapshot();
+    toast('🗑 Lembar kerja dikosongkan');
+  },{title:'Kosongkan Lembar Kerja',ok:'Hapus Semua',danger:true});
+}
+
 /* ========== FILES ========== */
 function persistFiles(silent){if(lsSet(K_FILES,JSON.stringify(files))){markSaved();if(!silent)toast('💾 Tersimpan');}}
 function loadFiles(){
@@ -1042,29 +1154,31 @@ function openFile(n){
   closeFiles();
 }
 function newFile(){
-  var n=prompt('Nama file baru:','page.html');
-  if(!n)return;n=n.trim();if(!n)return;
-  if(files.hasOwnProperty(n)){toast('File sudah ada');return;}
-  files[curName]=ta.value;
-  files[n]='';curName=n;ta.value='';
-  resetHist();refreshAll();
-  fnameEl.textContent=n;lsSet(K_CUR,curName);persistFiles(true);
-  closeFiles();toast('File baru: '+n);
+  nrPrompt('Nama file baru:','page.html',function(n){
+    if(files.hasOwnProperty(n)){toast('File sudah ada');return;}
+    files[curName]=ta.value;
+    files[n]='';curName=n;ta.value='';
+    resetHist();refreshAll();
+    fnameEl.textContent=n;lsSet(K_CUR,curName);persistFiles(true);
+    closeFiles();
+    toast('File baru: '+n);
+  },{title:'File Baru',ok:'Buat'});
 }
 function delFile(n){
-  if(!confirm('Hapus file "'+n+'"?'))return;
-  delete files[n];
-  if(Object.keys(files).length===0)files['index.html']='';
-  if(n===curName){curName=Object.keys(files)[0];ta.value=files[curName]||'';resetHist();refreshAll();fnameEl.textContent=curName;lsSet(K_CUR,curName);}
-  persistFiles(true);renderFiles();
+  nrConfirm('Hapus file "'+n+'"?',function(){
+    delete files[n];
+    if(Object.keys(files).length===0)files['index.html']='';
+    if(n===curName){curName=Object.keys(files)[0];ta.value=files[curName]||'';resetHist();refreshAll();fnameEl.textContent=curName;lsSet(K_CUR,curName);}
+    persistFiles(true);renderFiles();
+  },{title:'Hapus File',ok:'Hapus',danger:true});
 }
 function renFile(n){
-  var nn=prompt('Ganti nama "'+n+'" menjadi:',n);
-  if(!nn||nn===n)return;nn=nn.trim();if(!nn)return;
-  if(files.hasOwnProperty(nn)){toast('Nama sudah dipakai');return;}
-  files[nn]=files[n];delete files[n];
-  if(n===curName){curName=nn;fnameEl.textContent=nn;lsSet(K_CUR,curName);}
-  persistFiles(true);renderFiles();
+  nrPrompt('Ganti nama "'+n+'" menjadi:',n,function(nn){
+    if(files.hasOwnProperty(nn)){toast('Nama sudah dipakai');return;}
+    files[nn]=files[n];delete files[n];
+    if(n===curName){curName=nn;fnameEl.textContent=nn;lsSet(K_CUR,curName);}
+    persistFiles(true);renderFiles();
+  },{title:'Ganti Nama File',ok:'Simpan'});
 }
 function renderFiles(){
   filesList.innerHTML='';
@@ -1092,7 +1206,7 @@ function openFiles(){renderFiles();filesOverlay.classList.remove('hidden');}
 function closeFiles(){filesOverlay.classList.add('hidden');}
 function saveNow(){clearTimeout(histTimer);snapshot();files[curName]=ta.value;persistFiles(false);}
 
-/* ========== BURGER ========== */
+/* ========== BURGER + VERSI ========== */
 function toggleBurger(ev){
   if(ev)ev.stopPropagation();
   burgerEl.classList.toggle('open');
@@ -1104,12 +1218,48 @@ function bm(a){
   else if(a==='new')newFile();
   else if(a==='save')saveNow();
   else if(a==='theme')cycleTheme();
+  else if(a==='ver')toast('NR Edit Pro v'+APP_VERSION);
+  else if(a==='upd')forceUpdate();
 }
 document.addEventListener('click',function(e){
   if(burgerEl.classList.contains('open')&&!burgerEl.contains(e.target))closeBurger();
 });
+function readVer(obj){
+  for(var k in obj){if(k.replace(/\s/g,'')==='version')return String(obj[k]).trim();}
+  return null;
+}
+function verGt(a,b){
+  var pa=a.split('.'),pb=b.split('.'),i,x,y;
+  for(i=0;i<3;i++){
+    x=parseInt(pa[i],10)||0;y=parseInt(pb[i],10)||0;
+    if(x>y)return true;
+    if(x<y)return false;
+  }
+  return false;
+}
+function checkVersion(){
+  try{
+    fetch('version.json?'+Date.now()).then(function(r){return r.json();}).then(function(v){
+      var sv=readVer(v);
+      if(sv&&verGt(sv,APP_VERSION)){
+        document.getElementById('upd-dot').classList.remove('hidden');
+        document.getElementById('bm-upd').classList.remove('hidden');
+        document.getElementById('bm-updver').textContent='v'+sv;
+      }
+    }).catch(function(){});
+  }catch(e){}
+}
+function forceUpdate(){
+  toast('🔄 Memuat versi terbaru…');
+  try{
+    if(navigator.serviceWorker&&navigator.serviceWorker.controller){
+      navigator.serviceWorker.controller.postMessage('SKIP_WAITING');
+    }
+  }catch(e){}
+  setTimeout(function(){location.reload();},400);
+}
 
-/* ========== FULLSCREEN ========== */
+/* ========== FULLSCREEN + ORIENTASI ========== */
 function fsActive(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
 function tryLock(o){
   try{
@@ -1125,12 +1275,13 @@ function tryUnlock(){
 function setFSClass(on){
   document.body.classList.toggle('fs-on',on);
   setUse('fs-use',on?'i-min':'i-max');
+  applyForceRotate();
   setTimeout(layoutPreview,60);
 }
 function enterFakeFS(){
   fakeFS=true;
   setFSClass(true);
-  tryLock('landscape');
+  tryLock(orientMode);
   setTimeout(layoutPreview,350);
 }
 function exitFakeFS(){
@@ -1159,7 +1310,7 @@ function toggleFS(){
     else if(el.msRequestFullscreen)tried=el.msRequestFullscreen();
   }catch(e){tried=null;}
   if(tried&&tried.then){
-    tried.then(function(){tryLock('landscape');}).catch(function(){enterFakeFS();});
+    tried.then(function(){tryLock(orientMode);}).catch(function(){enterFakeFS();});
   }else if(tried===undefined&&!el.requestFullscreen&&!el.webkitRequestFullscreen){
     enterFakeFS();
   }else{
@@ -1168,8 +1319,8 @@ function toggleFS(){
 }
 function fsChange(){
   var on=fsActive();
-  if(on){setFSClass(true);tryLock('landscape');}
-  else if(!fakeFS){setFSClass(false);tryUnlock();}
+  if(on){setFSClass(true);tryLock(orientMode);}
+  else if(!fakeFS){setFSClass(false);}
   setTimeout(layoutPreview,350);
 }
 document.addEventListener('fullscreenchange',fsChange);
@@ -1180,7 +1331,7 @@ function togglePill(ev){
   p.classList.toggle('show');
   if(p.classList.contains('show')){
     clearTimeout(pillTimer);
-    pillTimer=setTimeout(hidePill,3500);
+    pillTimer=setTimeout(hidePill,6000);
   }
 }
 function hidePill(){document.getElementById('fs-pill').classList.remove('show');}
@@ -1276,10 +1427,10 @@ function cycleTheme(){
   toast('Tema: '+tLbs[next]);
 }
 
-/* ========== COPY / PASTE ========== */
+/* ========== COPY ========== */
 function copyCode(){
   var t=ta.value;
-  function ok(){toast('📋 Kode disalin!');}
+  function ok(){toast('📋 HTML disalin!');}
   function fb(){
     var tmp=document.createElement('textarea');
     tmp.value=t;document.body.appendChild(tmp);
@@ -1296,38 +1447,6 @@ function insertAtCursor(t){
   if(!done){ta.setRangeText(t,ta.selectionStart,ta.selectionEnd,'end');onInput();}
   scheduleMatch();
   ensureVisible(ta.selectionStart);
-}
-function pasteCode(){
-  function ins(t){insertAtCursor(t);toast('📥 Ditempel');}
-  if(navigator.clipboard&&navigator.clipboard.readText){
-    var settled=false;
-    var to=setTimeout(function(){
-      if(!settled){settled=true;openPaste();}
-    },1500);
-    navigator.clipboard.readText().then(function(t){
-      clearTimeout(to);
-      if(settled)return;settled=true;
-      if(t)ins(t);else openPaste();
-    }).catch(function(){
-      clearTimeout(to);
-      if(settled)return;settled=true;
-      openPaste();
-    });
-  }else{
-    openPaste();
-  }
-}
-function openPaste(){
-  pasteOverlay.classList.remove('hidden');
-  pasteArea.value='';
-  setTimeout(function(){pasteArea.focus();},80);
-}
-function closePaste(){pasteOverlay.classList.add('hidden');}
-function doPasteInsert(){
-  var t=pasteArea.value;
-  closePaste();
-  if(t){insertAtCursor(t);toast('📥 Ditempel');}
-  else toast('Kotak masih kosong');
 }
 
 /* ========== FNBAR ========== */
@@ -1356,19 +1475,23 @@ ta.addEventListener('blur',function(){
   },150);
 });
 
-/* ========== INPUT ========== */
+/* ========== TAB SWITCH ========== */
 function switchTab(tab){
-  var ep=document.getElementById('pane-edit'),pp=document.getElementById('pane-preview'),
-      te=document.getElementById('tab-edit'),tp=document.getElementById('tab-preview');
+  var ep=document.getElementById('pane-edit'),pp=document.getElementById('pane-preview');
+  document.body.classList.toggle('tab-preview',tab==='preview');
   if(tab==='edit'){
     ep.classList.remove('hidden');pp.classList.add('hidden');
-    te.classList.add('active');tp.classList.remove('active');syncScroll();
+    syncScroll();
   }else{
     ep.classList.add('hidden');pp.classList.remove('hidden');
-    te.classList.remove('active');tp.classList.add('active');
     updatePreview();
     setTimeout(layoutPreview,0);
   }
+}
+function runPreview(){
+  updatePreview();
+  if(window.innerWidth<=768&&!fsOn())switchTab('preview');
+  layoutPreview();
 }
 function onInput(){
   rebuildLineStarts();
@@ -1409,8 +1532,9 @@ ta.addEventListener('keydown',function(e){
 });
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
+    if(!dlgOverlay.classList.contains('hidden')){dlgClose();return;}
     var a=document.activeElement;
-    if(a!==fbFind&&a!==fbRep){closeFind();closeFiles();closeBurger();closePaste();}
+    if(a!==fbFind&&a!==fbRep){closeFind();closeFiles();closeBurger();}
     return;
   }
   if(e.ctrlKey||e.metaKey){
@@ -1431,10 +1555,14 @@ try{
   fnameEl.textContent=curName;
   curDevId=lsGet(K_PV);
   if(!getDev())curDevId=isTouch?'m360':'d1366';
+  orientMode=(getDev().w>getDev().h)?'landscape':'portrait';
   buildDeviceSelect();
+  updateOrientUI();
+  document.getElementById('bm-vernum').textContent='v'+APP_VERSION;
   measureChar();
   initFnbar();
   fitViewport();
+  applyForceRotate();
   rebuildLineStarts();
   resetHist();
   renderGutter();
@@ -1443,6 +1571,7 @@ try{
   updateStatus();
   updateMatches();
   markSaved();
+  checkVersion();
   if(window.innerWidth<=768)switchTab('edit');
   layoutPreview();
   setTimeout(layoutPreview,150);
@@ -1459,15 +1588,10 @@ if('serviceWorker' in navigator){
         var nw=reg.installing;
         nw.addEventListener('statechange',function(){
           if(nw.state==='installed'&&navigator.serviceWorker.controller){
-            toast('🔄 Update terdeteksi — muat ulang buat terapkan');
+            toast('🔄 Update terdeteksi — buka burger menu → "Update tersedia"');
           }
         });
       });
-    }).catch(function(){});
-    fetch('version.json?'+Date.now()).then(function(r){return r.json();}).then(function(v){
-      var old=null;try{old=localStorage.getItem('nr_ver');}catch(e){}
-      if(old&&old!==v.version)toast('🆕 Versi baru tersedia: '+v.version);
-      try{localStorage.setItem('nr_ver',v.version);}catch(e){}
     }).catch(function(){});
   });
 }

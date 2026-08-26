@@ -1,7 +1,7 @@
-/* NR Edit Pro — Service Worker v1.0.4 */
-var VERSION = '1.0.4';
+/* NR Edit Pro — Service Worker v1.0.5 */
+var VERSION = '1.0.5';
 var CACHE = 'nr-edit-pro-' + VERSION;
-var CORE = ['./', './index.html', './icon-192.png', './icon-512.png'];
+var CORE = ['./', './index.html'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(
@@ -18,6 +18,7 @@ self.addEventListener('activate', function (e) {
   );
 });
 
+/* biar bisa dipaksa update dari halaman (tombol "Update tersedia" di burger) */
 self.addEventListener('message', function (e) {
   if (e.data === 'SKIP_WAITING') self.skipWaiting();
 });
@@ -25,6 +26,8 @@ self.addEventListener('message', function (e) {
 self.addEventListener('fetch', function (e) {
   var req = e.request;
   if (req.method !== 'GET' || req.url.indexOf(self.location.origin) !== 0) return;
+
+  /* halaman: network-first, fallback cache (offline tetap kebuka) */
   if (req.mode === 'navigate') {
     e.respondWith(
       fetch(req).then(function (res) {
@@ -35,6 +38,8 @@ self.addEventListener('fetch', function (e) {
     );
     return;
   }
+
+  /* aset lain: cache-first */
   e.respondWith(
     caches.match(req).then(function (hit) {
       return hit || fetch(req).then(function (res) {
