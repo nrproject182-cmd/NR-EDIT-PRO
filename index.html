@@ -860,7 +860,7 @@ function bindHold(btn,dir,jumpFn){
   btn.addEventListener('mouseup',up);
   btn.addEventListener('mouseleave',cancel);
 }
-var SPLIT_MAX=20000,splitChunks=[],splitIdx=0;
+var SPLIT_MAX=130000,splitChunks=[],splitIdx=0;
 function openSplit(){
   var s=ta.selectionStart,e=ta.selectionEnd;
   var text=(e>s)?ta.value.slice(s,e):ta.value;
