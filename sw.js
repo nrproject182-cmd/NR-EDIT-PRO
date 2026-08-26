@@ -1,8 +1,7 @@
-/* NR Edit Pro — Service Worker
-   Kalau lu rilis versi baru, NAIKKAN angka VERSION biar cache ke-refresh */
-var VERSION = '1.0.0';
+/* NR Edit Pro — Service Worker v1.0.1 */
+var VERSION = '1.0.1';
 var CACHE = 'nr-edit-pro-' + VERSION;
-var CORE = ['./', './index.html', './manifest.webmanifest', './icon.svg', './version.json'];
+var CORE = ['./', './index.html', './manifest.json', './icon.svg', './version.json'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(
@@ -19,7 +18,6 @@ self.addEventListener('activate', function (e) {
   );
 });
 
-/* biar bisa dipaksa update dari halaman */
 self.addEventListener('message', function (e) {
   if (e.data === 'SKIP_WAITING') self.skipWaiting();
 });
@@ -27,8 +25,6 @@ self.addEventListener('message', function (e) {
 self.addEventListener('fetch', function (e) {
   var req = e.request;
   if (req.method !== 'GET' || req.url.indexOf(self.location.origin) !== 0) return;
-
-  /* halaman: network-first, fallback cache (biar offline tetap kebuka) */
   if (req.mode === 'navigate') {
     e.respondWith(
       fetch(req).then(function (res) {
@@ -39,8 +35,6 @@ self.addEventListener('fetch', function (e) {
     );
     return;
   }
-
-  /* aset lain: cache-first, kalau gak ada baru ke jaringan */
   e.respondWith(
     caches.match(req).then(function (hit) {
       return hit || fetch(req).then(function (res) {
