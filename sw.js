@@ -1,5 +1,5 @@
-/* NR Edit Pro — Service Worker v1.1.4 */
-var VERSION = '1.1.4';
+/* NR Edit Pro — Service Worker v1.2.7 */
+var VERSION = '1.2.7';
 var CACHE = 'nr-edit-pro-' + VERSION;
 var CORE = ['./', './index.html'];
 self.addEventListener('install', function (e) {
