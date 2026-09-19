@@ -1,1 +1,11 @@
-{"name":"NR Edit Pro","version":"1.2.7","build":14,"release":"2026-08-27","info":"v1.2.7: update OTOMATIS anti-loop, fix icon device mencong, copy bertahap 130rb."}
+{
+  "version": "1.1.0",
+  "build": 1,
+  "date": "2026-09-19",
+  "app": "Quick Editor Pro",
+  "url": "https://USERNAME-GITHUB.github.io/NAMA-REPO/",
+  "changelog": [
+    "v1.1.0 - Save file ke penyimpanan, daftar file tersimpan + tombol export, PWA offline (manifest + SW)",
+    "v1.0.0 - Rilis pertama: editor, blok pintar, emulator preview, cek update"
+  ]
+}
