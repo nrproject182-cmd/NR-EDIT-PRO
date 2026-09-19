@@ -4,7 +4,7 @@ const CACHE = 'qep-' + VERSION;
 const CORE = [
   './',
   './index.html',
-  './manifest.webmanifest',
+  './manifest.json',
   './version.json',
   './icon-192.png',
   './icon-512.png'
@@ -15,7 +15,7 @@ self.addEventListener('install', function(e){
   e.waitUntil(
     caches.open(CACHE).then(function(c){
       return Promise.all(CORE.map(function(u){
-        return c.add(u).catch(function(){ /* skip file yang belum ada */ });
+        return c.add(u).catch(function(){ return null; });
       }));
     }).then(function(){
       return self.skipWaiting();
@@ -23,7 +23,7 @@ self.addEventListener('install', function(e){
   );
 });
 
-/* Activate: bersihkan cache versi lama + klaim client + kabari app */
+/* Activate: buang cache versi lama, klaim client, kabari app */
 self.addEventListener('activate', function(e){
   e.waitUntil(
     caches.keys().then(function(keys){
@@ -45,7 +45,7 @@ self.addEventListener('fetch', function(e){
   if (req.method !== 'GET') return;
   var url = new URL(req.url);
 
-  /* Same-origin (file app): NETWORK-FIRST biar update GitHub Pages langsung kepake, fallback cache kalau offline */
+  /* Same-origin: network-first, fallback cache (offline tetap jalan) */
   if (url.origin === location.origin) {
     e.respondWith(
       fetch(req).then(function(res){
@@ -63,7 +63,7 @@ self.addEventListener('fetch', function(e){
     return;
   }
 
-  /* Cross-origin (CDN CodeMirror dll): CACHE-FIRST biar hemat kuota & bisa offline */
+  /* Cross-origin (CDN CodeMirror): cache-first biar offline + hemat kuota */
   e.respondWith(
     caches.match(req).then(function(hit){
       if (hit) return hit;
