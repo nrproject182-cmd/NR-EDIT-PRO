@@ -174,14 +174,15 @@ body.fs .fs-fab{display:flex}
 .side-list{padding:7px}
 .side-empty{padding:16px 14px;color:var(--txt2);font-size:13px;line-height:1.6}
 .side-empty b{color:var(--txt)}
-.file-row{display:flex;align-items:center;gap:8px;padding:10px 10px;border-radius:9px}
+.file-row{display:flex;align-items:center;gap:6px;padding:10px 8px;border-radius:9px}
 .file-row:hover{background:var(--bg3)}
 .file-row>.ficon{width:18px;height:18px;color:var(--accent);flex-shrink:0}
 .fname{flex:1;cursor:pointer;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fexp,.fdel{background:none;border:none;cursor:pointer;padding:6px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--txt2);flex-shrink:0}
+.fexp,.fdel,.fren{background:none;border:none;cursor:pointer;padding:6px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--txt2);flex-shrink:0}
 .fexp:hover{background:var(--bg4);color:var(--accent)}
+.fren:hover{background:var(--bg4);color:var(--accent)}
 .fdel:hover{background:var(--bg4);color:#ef4444}
-.fexp svg,.fdel svg{width:16px;height:16px}
+.fexp svg,.fdel svg,.fren svg{width:16px;height:16px}
 .ov{position:fixed;inset:0;background:rgba(10,15,30,.45);display:none;z-index:999}
 .ov.on{display:block}
 
@@ -389,6 +390,15 @@ body.fs .fs-fab{display:flex}
   </div>
 </div>
 
+<div class="modal-bg" id="modalRename">
+  <div class="modal">
+    <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>Ganti Nama File</h3>
+    <p id="rnFrom" style="margin-bottom:10px"></p>
+    <input id="rnInput" placeholder="nama-baru.html">
+    <div class="modal-btns"><button class="mbtn s" onclick="clModal('modalRename')">Batal</button><button class="mbtn p" onclick="cfRename()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>Ganti</button></div>
+  </div>
+</div>
+
 <div class="modal-bg" id="modalCopy">
   <div class="modal" style="min-width:300px">
     <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy Bertahap</h3>
@@ -448,14 +458,14 @@ body.fs .fs-fab{display:flex}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 'use strict';
-var APP_VERSION='1.5.2';
+var APP_VERSION='1.6.0';
 var UPDATE_CHECK_URL='version.json';
 var UPDATE_CHECK_INTERVAL=3600000;
-var REG='qed_files',FILEKEY='qed_file_',DRAFTKEY='qed_draft_';
+var REG='qed_files',FILEKEY='qed_file_',DRAFTKEY='qed_draft_',LASTKEY='qed_lastfile';
 var CHUNK=130000;
 var def='<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<title>My Page</title>\n</head>\n<body>\n<h1>Hello!</h1>\n</body>\n</html>';
 var ed=null,usingCM=false,curFile='index.html',curTheme='light',openF=['index.html'];
-var searchMarks=[],searchTimer,copyChunks=[],copyIdx=0,cfCb=null;
+var searchMarks=[],searchTimer,copyChunks=[],copyIdx=0,cfCb=null,renameFrom=null;
 var pvOpen=false,pvUrl='',zoomMode=false,orient=null,pseudoFS=false,nativeFS=false;
 var tagBlock=localStorage.getItem('qed_tagblock')==='1';
 var autoFormat=localStorage.getItem('qed_autoformat')==='1';
@@ -502,6 +512,9 @@ function renderFiles(){
     html+='<div class="file-row">'+
       '<svg class="ficon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'+
       '<span class="fname" onclick="openFile(\''+escAttr(n)+'\')">'+escHtml(n)+'</span>'+
+      '<button class="fren" onclick="renameFile(\''+escAttr(n)+'\')" title="Ganti nama">'+
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>'+
+      '</button>'+
       '<button class="fexp" onclick="exportFile(\''+escAttr(n)+'\')" title="Export / Download">'+
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'+
       '</button>'+
@@ -536,6 +549,42 @@ function delFile(n){
     renderFiles();
     toast('🗑️ File dihapus: '+n);
   });
+}
+// ===== RENAME FILE =====
+function renameFile(old){
+  renameFrom=old;
+  document.getElementById('rnFrom').textContent='Nama sekarang: '+old;
+  var i=document.getElementById('rnInput');
+  i.value=old;
+  document.getElementById('modalRename').classList.add('on');
+  setTimeout(function(){i.focus();if(i.select)i.select()},120);
+}
+function cfRename(){
+  var nn=document.getElementById('rnInput').value.trim();
+  var old=renameFrom;
+  if(!nn){toast('Nama tidak boleh kosong');return}
+  if(!old){clModal('modalRename');return}
+  if(nn===old){clModal('modalRename');return}
+  if(getReg().indexOf(nn)>-1||openF.indexOf(nn)>-1){toast('Nama sudah dipakai file lain');return}
+  var c=fileGet(old);
+  if(c!==null){fileSet(nn,c);localStorage.removeItem(FILEKEY+old)}
+  var d=draftGet(old);
+  if(d!==null){draftSet(nn,d);localStorage.removeItem(DRAFTKEY+old)}
+  var reg=getReg();var ri=reg.indexOf(old);if(ri>-1){reg[ri]=nn;setReg(reg)}
+  var oi=openF.indexOf(old);if(oi>-1)openF[oi]=nn;
+  if(curFile===old){curFile=nn;localStorage.setItem(LASTKEY,nn)}
+  rebuildTabs();
+  renderFiles();
+  clModal('modalRename');
+  toast('✏️ Nama diganti: '+old+' → '+nn);
+}
+function rebuildTabs(){
+  var t=document.getElementById('tabs');
+  t.querySelectorAll('.tab').forEach(function(el){el.remove()});
+  openF.forEach(function(f){addTab(f)});
+  t.querySelectorAll('.tab').forEach(function(el){el.classList.toggle('on',el.dataset.f===curFile)});
+  document.getElementById('fName').textContent=curFile;
+  document.getElementById('fType').textContent=curFile.split('.').pop().toUpperCase();
 }
 function triggerUpload(){var i=document.getElementById('fileUpload');if(i)i.click()}
 function handleUpload(input){
@@ -816,6 +865,16 @@ function loadContentFor(name){
 function formatLines(){
   if(!ed)return;
   for(var i=0;i<ed.lineCount();i++)ed.indentLine(i,'smart');
+}
+
+// ===== AUTO-OPEN FILE TERAKHIR =====
+function bootLastFile(){
+  var lf=localStorage.getItem(LASTKEY);
+  if(!lf)return;
+  var exists=(fileGet(lf)!==null)||(draftGet(lf)!==null)||(getReg().indexOf(lf)>-1);
+  if(!exists)return;
+  curFile=lf;
+  openF=[lf];
 }
 
 function initEditor(){
@@ -1157,6 +1216,7 @@ function swTab(f){
   draftSet(curFile,ed.getValue());
   document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('on',t.dataset.f===f)});
   curFile=f;
+  localStorage.setItem(LASTKEY,f);
   ed.setValue(loadContentFor(f));
   document.getElementById('fType').textContent=f.split('.').pop().toUpperCase();
   document.getElementById('fName').textContent=f;
@@ -1262,11 +1322,13 @@ document.addEventListener('keydown',function(e){
   if(e.ctrlKey&&e.key==='s'){e.preventDefault();doSave()}
   if(e.ctrlKey&&e.key==='n'){e.preventDefault();newFile()}
   if(e.ctrlKey&&e.key==='f'){e.preventDefault();togFind()}
-  if(e.key==='Escape'){clFind();clModal('modalNew');clModal('modalCopy');clModal('modalConfirm');clModal('modalClose');clModal('modalAbout');closeDevModal();closeSet()}
+  if(e.key==='Escape'){clFind();clModal('modalNew');clModal('modalRename');clModal('modalCopy');clModal('modalConfirm');clModal('modalClose');clModal('modalAbout');closeDevModal();closeSet()}
 });
 
 window.addEventListener('beforeunload',function(){if(ed)draftSet(curFile,ed.getValue())});
 
+bootLastFile();
+if(curFile!=='index.html'||openF.length!==1)rebuildTabs();
 renderFiles();
 initEditor();
 setTimeout(fixH,150);

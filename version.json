@@ -1,17 +1,18 @@
 {
-  "version": "1.5.2",
-  "build": 8,
+  "version": "1.6.0",
+  "build": 9,
   "date": "2026-09-20",
   "app": "NR Editor",
   "url": "https://nrproject182-cmd.github.io/NR-EDIT-PRO/",
   "changelog": [
+    "v1.6.0 - Edit nama file (rename) di sidebar, auto-open file terakhir saat aplikasi dibuka",
     "v1.5.2 - Convert Code dihapus (stabilisasi), fix sw.js & version.json",
-    "v1.5.1 - Popup Convert Code (sudah dihapus di 1.5.2)",
-    "v1.5.0 - Convert Code, tab pendek",
-    "v1.4.0 - NR Editor, Auto Format, orientasi fix, icon SVG",
-    "v1.3.0 - Switch iOS-style, scrollbar custom",
-    "v1.2.0 - Upload file, popup tutup tab, highlight baris",
-    "v1.1.0 - Save ke penyimpanan, export, PWA offline",
+    "v1.5.1 - Popup Convert Code (dihapus di 1.5.2)",
+    "v1.5.0 - Convert Code, tab lebih pendek",
+    "v1.4.0 - Nama jadi NR Editor, switch Auto Format, orientasi play fix, semua icon SVG",
+    "v1.3.0 - Switch iOS-style di settings, scrollbar custom besar",
+    "v1.2.0 - Upload file, popup tutup tab (simpan/tanpa simpan), highlight baris aktif",
+    "v1.1.0 - Save ke penyimpanan, daftar file + export, PWA offline",
     "v1.0.0 - Rilis pertama"
   ]
 }
