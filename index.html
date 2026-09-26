@@ -144,6 +144,7 @@ body.fs .fsmenu.show{transform:translateY(0);opacity:1;visibility:visible}
 .fs-btn.dev{background:var(--bg3)}
 .fs-btn.dev svg{width:15px;height:15px;color:var(--txt2)}
 .fs-btn.red{color:#e11d48}
+.fs-btn svg{width:17px;height:17px;flex-shrink:0}
 .fs-fab{position:fixed;top:14px;right:14px;width:46px;height:46px;border-radius:50%;background:var(--bg);border:1px solid var(--border);box-shadow:var(--shadow2);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:7001;color:var(--txt)}
 body.fs .fs-fab{display:flex}
 .fs-fab svg{width:20px;height:20px}
@@ -205,6 +206,26 @@ body.fs .fs-fab{display:flex}
 .toast{position:fixed;bottom:74px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg3);color:var(--txt);padding:11px 22px;border-radius:11px;z-index:10000;opacity:0;transition:all .3s;font-size:13px;font-weight:700;pointer-events:none;box-shadow:var(--shadow2);border:1px solid var(--border);display:flex;align-items:center;gap:8px}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ===== WELCOME PAGE ===== */
+.welcome{position:fixed;inset:0;background:var(--bg);z-index:400;display:none;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
+body.welcome .welcome{display:flex}
+body.welcome .selext{display:none!important}
+.wcard{width:100%;max-width:360px;text-align:center;padding:10px 0}
+.wlogo{width:86px;height:86px;border-radius:26px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:var(--shadow2)}
+.wlogo svg{width:44px;height:44px;color:#fff}
+.wtitle{font-size:27px;font-weight:900;letter-spacing:.3px}
+.wsub{font-size:13px;color:var(--txt2);margin:6px 0 22px;font-weight:600}
+.wbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;padding:14px;border-radius:13px;border:1px solid var(--border);background:var(--bg2);color:var(--txt);font-size:14px;font-weight:800;cursor:pointer;margin-bottom:10px;box-shadow:var(--shadow);transition:transform .1s}
+.wbtn:active{transform:scale(.97)}
+.wbtn.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.wbtn svg{width:18px;height:18px;flex-shrink:0}
+.wrecent{margin-top:20px;text-align:left}
+.wrecent .wr-t{font-size:10px;font-weight:800;letter-spacing:1.2px;color:var(--txt2);margin-bottom:8px;text-align:center}
+.wr-item{display:flex;align-items:center;gap:9px;padding:12px;border-radius:11px;background:var(--bg2);border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:700;margin-bottom:7px;color:var(--txt)}
+.wr-item:active{background:var(--bg3)}
+.wr-item svg{width:16px;height:16px;color:var(--accent);flex-shrink:0}
+.wr-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(10,15,30,.55);z-index:9000;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
 .modal-bg.on{display:flex}
 .modal{background:var(--bg2);padding:22px;border-radius:16px;min-width:290px;max-width:90vw;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow2);border:1px solid var(--border)}
@@ -228,6 +249,31 @@ body.fs .fs-fab{display:flex}
 .copy-nav .pg{font-size:14px;font-weight:800;color:var(--accent);min-width:60px;text-align:center}
 .update-badge{display:inline-block;background:#f59e0b;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;margin-left:6px}
 @media(max-width:768px){.bbar-btn{padding:7px 4px}.fs-btn{padding:10px 12px;font-size:12px}}
+
+/* ===== MENU FULLSCREEN: DROPDOWN SAAT LAYAR POTRET ===== */
+/* Landscape TIDAK disentuh sama sekali — tetap baris horizontal seperti sekarang */
+@media (orientation: portrait){
+  .fsmenu{
+    top:68px;               /* muncul DI BAWAH tombol fab */
+    right:14px;
+    left:auto;
+    flex-direction:column;  /* susun ke bawah */
+    align-items:stretch;
+    max-width:250px;
+    max-height:calc(100vh - 84px);
+    overflow-x:hidden;
+    overflow-y:auto;
+    padding:6px;
+    transform:translateY(-14px) scale(.98);
+    transform-origin:top right;
+  }
+  body.fs .fsmenu.show{transform:translateY(0) scale(1)}
+  .fs-btn{width:100%;justify-content:flex-start;padding:13px 14px;border-radius:10px;flex-shrink:0}
+  .fs-btn+.fs-btn{border-left:none;border-top:1px solid var(--border)}
+  .fs-btn.dev{justify-content:space-between}
+  .fs-btn.dev svg{flex-shrink:0}
+  .fs-btn.red{justify-content:flex-start}
+}
 ::-webkit-scrollbar{width:7px;height:7px}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
 </style>
@@ -255,9 +301,9 @@ body.fs .fs-fab{display:flex}
     <div class="hdr-path" id="fName">index.html</div>
   </div>
   <div class="hdr-acts">
-    <button class="hdr-btn hv" onclick="doCopy()" title="Copy All"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-    <button class="hdr-btn hv" onclick="doPaste()" title="Paste"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></button>
-    <button class="hdr-btn hv" onclick="doClear()" title="Clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+    <button class="hdr-btn hv" onclick="doCopy()" title="Copy: block dipilih / seluruh kode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+    <button class="hdr-btn hv" onclick="doPaste()" title="Paste: timpa block / sisip di kursor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></button>
+    <button class="hdr-btn hv" onclick="doClear()" title="Hapus: block dipilih / seluruh isi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
     <button class="hdr-btn" onclick="openSet()" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
   </div>
 </div>
@@ -291,9 +337,10 @@ body.fs .fs-fab{display:flex}
   <div class="cmsb" id="cmsb"><div class="cmsb-thumb" id="cmsbThumb"></div></div>
 </div>
 
+<!-- Floating block: hanya extend atas/bawah -->
 <div class="selext">
-  <button class="sext-btn" id="sextUp" title="Klik: ±1 baris atas • Tahan: repeat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg></button>
-  <button class="sext-btn" id="sextDown" title="Klik: ±1 baris bawah • Tahan: repeat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
+  <button class="sext-btn" id="sextUp" title="Extend block ke atas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg></button>
+  <button class="sext-btn" id="sextDown" title="Extend block ke bawah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
 </div>
 
 <div class="pvwrap" id="pvWrap">
@@ -335,6 +382,19 @@ body.fs .fs-fab{display:flex}
   <button class="bbar-btn" onclick="doSave()" title="Save File"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></button>
   <button class="bbar-btn" onclick="doRun()" title="Play"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
   <button class="bbar-btn" onclick="doClose()" title="Tutup Tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+</div>
+
+<!-- ===== WELCOME PAGE ===== -->
+<div class="welcome" id="welcome">
+  <div class="wcard">
+    <div class="wlogo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+    <div class="wtitle">NR Editor</div>
+    <div class="wsub">Editor kode mobile cepat & ringan.<br>Mau mulai dari mana hari ini?</div>
+    <button class="wbtn p" onclick="wNew()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Buat File Baru</button>
+    <button class="wbtn" onclick="wOpen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Buka File Tersimpan</button>
+    <button class="wbtn" onclick="wUpload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload File</button>
+    <div class="wrecent" id="wRecent"></div>
+  </div>
 </div>
 
 <div class="devmodal" id="devModal" onclick="if(event.target===this)closeDevModal()">
@@ -458,10 +518,10 @@ body.fs .fs-fab{display:flex}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 'use strict';
-var APP_VERSION='1.6.0';
+var APP_VERSION='1.7.3';
 var UPDATE_CHECK_URL='version.json';
 var UPDATE_CHECK_INTERVAL=3600000;
-var REG='qed_files',FILEKEY='qed_file_',DRAFTKEY='qed_draft_',LASTKEY='qed_lastfile';
+var REG='qed_files',FILEKEY='qed_file_',DRAFTKEY='qed_draft_',LASTKEY='qed_lastfile',DEVKEY='qed_lastdev';
 var CHUNK=130000;
 var def='<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<title>My Page</title>\n</head>\n<body>\n<h1>Hello!</h1>\n</body>\n</html>';
 var ed=null,usingCM=false,curFile='index.html',curTheme='light',openF=['index.html'];
@@ -472,7 +532,9 @@ var autoFormat=localStorage.getItem('qed_autoformat')==='1';
 var clickPending=false;
 var growDir=0,internalSel=false;
 var updateAvailable=false,latestVersion=APP_VERSION;
-var curDev={name:'Desktop',w:1440,h:900};
+var welcomeOn=false;
+var savedDev=localStorage.getItem(DEVKEY);
+var curDev=savedDev?JSON.parse(savedDev):{name:'Desktop',w:1440,h:900};
 var DEVICES=[
  {cat:'HP',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',color:'#2563eb',items:[['Android Small',360,800],['Android Large',412,915],['iPhone SE',375,667],['iPhone 12',390,844]]},
  {cat:'TABLET',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',color:'#10b981',items:[['Tablet 7in',600,1024],['Tablet 10in',800,1280],['iPad',768,1024],['iPad Pro',1024,1366]]},
@@ -480,10 +542,30 @@ var DEVICES=[
 ];
 var VOIDTAGS={meta:1,br:1,hr:1,img:1,input:1,link:1,source:1,wbr:1,col:1,embed:1,area:1,base:1,param:1,track:1};
 
-// ===== STORAGE =====
-function getReg(){try{var a=JSON.parse(localStorage.getItem(REG)||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
+// ===== STORAGE (ANTI DUPLIKAT) =====
+function getReg(){
+  var a=[];
+  try{a=JSON.parse(localStorage.getItem(REG)||'[]')}catch(e){a=[]}
+  if(!Array.isArray(a))a=[];
+  var out=[],changed=false;
+  a.forEach(function(raw){
+    var n=String(raw==null?'':raw).trim();
+    if(!n){changed=true;return}
+    if(n!==String(raw))changed=true;
+    if(out.indexOf(n)>-1){
+      try{
+        if(localStorage.getItem(FILEKEY+n)===null&&localStorage.getItem(FILEKEY+raw)!==null)localStorage.setItem(FILEKEY+n,localStorage.getItem(FILEKEY+raw));
+        if(localStorage.getItem(DRAFTKEY+n)===null&&localStorage.getItem(DRAFTKEY+raw)!==null)localStorage.setItem(DRAFTKEY+n,localStorage.getItem(DRAFTKEY+raw));
+      }catch(e){}
+      changed=true;return;
+    }
+    out.push(n);
+  });
+  if(changed){try{setReg(out)}catch(e){}}
+  return out;
+}
 function setReg(a){localStorage.setItem(REG,JSON.stringify(a))}
-function regAdd(n){var a=getReg();if(a.indexOf(n)<0){a.push(n);setReg(a)}}
+function regAdd(n){n=String(n||'').trim();if(!n)return;var a=getReg();if(a.indexOf(n)<0){a.push(n);setReg(a)}}
 function regRemove(n){var a=getReg();var i=a.indexOf(n);if(i>-1){a.splice(i,1);setReg(a)}}
 function fileGet(n){return localStorage.getItem(FILEKEY+n)}
 function fileSet(n,c){localStorage.setItem(FILEKEY+n,c);regAdd(n)}
@@ -547,6 +629,7 @@ function delFile(n){
     localStorage.removeItem(DRAFTKEY+n);
     regRemove(n);
     renderFiles();
+    renderWelcomeRecent();
     toast('🗑️ File dihapus: '+n);
   });
 }
@@ -595,7 +678,7 @@ function handleUpload(input){
   files.forEach(function(f){
     var r=new FileReader();
     r.onload=function(ev){
-      var name=String(f.name||('upload-'+Date.now()+'.txt'));
+      var name=String(f.name||('upload-'+Date.now()+'.txt')).trim();
       var txt=String(ev.target.result||'');
       fileSet(name,txt);draftSet(name,txt);
       last=name;done++;
@@ -662,6 +745,36 @@ function openAbout(){
   document.getElementById('appVersion').textContent=APP_VERSION;
   document.getElementById('modalAbout').classList.add('on');
   checkUpdate(false);
+}
+
+// ===== WELCOME PAGE =====
+function showWelcome(){
+  welcomeOn=true;
+  document.body.classList.add('welcome');
+  document.body.classList.remove('has-sel');
+  renderWelcomeRecent();
+}
+function hideWelcome(){
+  if(!welcomeOn)return;
+  welcomeOn=false;
+  document.body.classList.remove('welcome');
+  setTimeout(function(){if(ed)ed.refresh();syncSb()},60);
+}
+function wNew(){newFile()}
+function wOpen(){togSide()}
+function wUpload(){triggerUpload()}
+function renderWelcomeRecent(){
+  var host=document.getElementById('wRecent');
+  if(!host)return;
+  var reg=getReg().slice(-6).reverse();
+  if(!reg.length){host.innerHTML='';return}
+  var html='<div class="wr-t">FILE TERAKHIR</div>';
+  reg.forEach(function(n){
+    html+='<div class="wr-item" onclick="openFile(\''+escAttr(n)+'\')">'+
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'+
+      '<span>'+escHtml(n)+'</span></div>';
+  });
+  host.innerHTML=html;
 }
 
 // ===== PLAIN EDITOR FALLBACK =====
@@ -935,11 +1048,11 @@ function initEditor(){
       setTimeout(function(){toast('⚠️ Mode sederhana')},800);
     }
   }catch(err){usingCM=false;ed=new PlainEditor(ta)}
-  ed.on('change',function(){draftSet(curFile,ed.getValue());updWC();syncSb();if(document.getElementById('findP').classList.contains('on'))onFindInput()});
+  ed.on('change',function(){if(!welcomeOn)draftSet(curFile,ed.getValue());updWC();syncSb();if(document.getElementById('findP').classList.contains('on'))onFindInput()});
   ed.on('cursorActivity',function(){
     if(!internalSel)growDir=0;
     updStat();
-    document.body.classList.toggle('has-sel',ed.somethingSelected());
+    document.body.classList.toggle('has-sel',ed.somethingSelected()&&!welcomeOn);
     if(!usingCM||!tagBlock||!clickPending)return;
     if(ed.somethingSelected()){clickPending=false;return}
     clickPending=false;
@@ -957,7 +1070,7 @@ function initEditor(){
       toast('Blok tidak ketemu di sini');
     }
   });
-  ed.setValue(loadContentFor(curFile));
+  ed.setValue(welcomeOn?'':loadContentFor(curFile));
   updStat();updWC();fixH();syncSwitches();
   setTimeout(function(){if(ed)ed.refresh();syncSb()},250);
   setTimeout(function(){if(ed)ed.refresh();syncSb()},700);
@@ -1047,7 +1160,7 @@ function syncSb(){
   document.addEventListener('mouseup',function(){drag=null;thumb.classList.remove('drag')});
 })();
 
-// ===== TOMBOL BLOCK ▲▼ =====
+// ===== TOMBOL BLOCK ▲▼ (EXTEND SAJA) =====
 (function(){
   var timer=null,lastTouch=0;
   function setSel(a,b){internalSel=true;ed.setSelection(a,b);setTimeout(function(){internalSel=false},0)}
@@ -1145,6 +1258,7 @@ function togAutoFormat(){
 }
 function doFormatNow(){formatLines();toast('Kode dirapikan')}
 function doSave(){
+  if(welcomeOn){toast('Buka / buat file dulu');return}
   if(autoFormat)formatLines();
   var c=ed.getValue();
   fileSet(curFile,c);
@@ -1152,17 +1266,47 @@ function doSave(){
   renderFiles();
   toast('💾 Tersimpan: '+curFile);
 }
-function doCopy(){var t=ed.getSelection()||ed.getValue();if(navigator.clipboard)navigator.clipboard.writeText(t).then(function(){toast('Tersalin!')}).catch(function(){toast('Gagal')});else toast('Gagal')}
-function doPaste(){
-  if(navigator.clipboard&&navigator.clipboard.readText){
-    navigator.clipboard.readText().then(function(t){
-      if(t){ed.replaceSelection(t);toast('Tempel berhasil!');}
-    }).catch(function(){toast('Gunakan Ctrl+V');});
+
+// ===== COPY / PASTE / HAPUS: FUNGSI GANDA (BLOCK vs SELURUH) =====
+function doCopy(){
+  if(!ed||welcomeOn)return;
+  var hasSel=ed.somethingSelected();
+  var t=hasSel?ed.getSelection():ed.getValue();
+  if(!t){toast('Tidak ada yang bisa dicopy');return}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){
+      toast(hasSel?'✓ Block tersalin ('+t.length+' karakter)':'✓ Seluruh kode tersalin ('+t.length+' karakter)');
+    }).catch(function(){toast('⚠️ Gagal copy')});
   }else{
-    toast('Gunakan Ctrl+V');
+    toast('⚠️ Clipboard tidak tersedia');
   }
 }
-function doClear(){askConfirm('Hapus semua isi file ini?',function(){ed.setValue('');toast('Isi file dihapus')})}
+function doPaste(){
+  if(!ed||welcomeOn)return;
+  if(!(navigator.clipboard&&navigator.clipboard.readText)){toast('Gunakan Ctrl+V');return}
+  var hasSel=ed.somethingSelected();
+  navigator.clipboard.readText().then(function(t){
+    if(!t){toast('Clipboard kosong');return}
+    ed.replaceSelection(t);
+    ed.focus();
+    toast(hasSel?'✓ Block ditimpa clipboard ('+t.length+' karakter)':'✓ Clipboard ditempel di kursor');
+  }).catch(function(){toast('Gunakan Ctrl+V')});
+}
+function doClear(){
+  if(!ed||welcomeOn)return;
+  if(ed.somethingSelected()){
+    var sel=ed.getSelection();
+    askConfirm('Hapus '+sel.length+' karakter yang dipilih?',function(){
+      ed.replaceSelection('');
+      toast('✓ Block dihapus');
+    });
+  }else{
+    askConfirm('Hapus semua isi file ini?',function(){
+      ed.setValue('');
+      toast('Isi file dihapus');
+    });
+  }
+}
 function doUndo(){ed.undo()}
 function doRedo(){ed.redo()}
 function openSet(){syncSwitches();document.getElementById('setModal').classList.add('on')}
@@ -1171,6 +1315,7 @@ function askConfirm(msg,cb){cfCb=cb;document.getElementById('cfMsg').textContent
 function cfAnswer(y){document.getElementById('modalConfirm').classList.remove('on');if(y&&cfCb)cfCb();cfCb=null}
 
 function doClose(){
+  if(welcomeOn)return;
   var saved=fileGet(curFile);
   var cur=ed.getValue();
   var changed=(saved===null)?(cur.trim()!==''):(cur!==saved);
@@ -1213,7 +1358,7 @@ function newFile(){document.getElementById('mInput').value='';document.getElemen
 function openFile(f){if(openF.indexOf(f)<0){openF.push(f);addTab(f)}swTab(f);var s=document.getElementById('side');if(s.classList.contains('on'))togSide();toast('Dibuka: '+f)}
 function addTab(f){var t=document.getElementById('tabs'),d=document.createElement('div');d.className='tab';d.dataset.f=f;d.onclick=function(){swTab(f)};d.innerHTML='<span>'+escHtml(f)+'</span><span class="tab-x" onclick="clTab(event,\''+escAttr(f)+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>';t.insertBefore(d,t.lastElementChild)}
 function swTab(f){
-  draftSet(curFile,ed.getValue());
+  if(!welcomeOn)draftSet(curFile,ed.getValue());
   document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('on',t.dataset.f===f)});
   curFile=f;
   localStorage.setItem(LASTKEY,f);
@@ -1221,15 +1366,16 @@ function swTab(f){
   document.getElementById('fType').textContent=f.split('.').pop().toUpperCase();
   document.getElementById('fName').textContent=f;
   updWC();clearSearchMarks();
+  hideWelcome();
   setTimeout(function(){ed.refresh();syncSb()},50);
 }
 function closeTabCore(f){
   var i=openF.indexOf(f);if(i>-1)openF.splice(i,1);
   var t=document.querySelector('.tab[data-f="'+f+'"]');if(t)t.remove();
-  if(!openF.length){openF.push('untitled.html');addTab('untitled.html')}
+  if(!openF.length){showWelcome();return}
   if(curFile===f)swTab(openF[Math.max(0,i-1)]||openF[0]);
 }
-function clTab(e,f){if(e&&e.stopPropagation)e.stopPropagation();closeTabCore(f);toast('Tab ditutup: '+f)}
+function clTab(e,f){if(e&&e.stopPropagation)e.stopPropagation();closeTabCore(f);if(openF.length)toast('Tab ditutup: '+f)}
 
 function openCopyBertahap(){var c=ed.getValue();copyChunks=[];for(var i=0;i<c.length;i+=CHUNK)copyChunks.push(c.substring(i,i+CHUNK));if(!copyChunks.length)copyChunks=[''];copyIdx=0;document.getElementById('copyTotal').textContent=c.length+' karakter';updCopyView();document.getElementById('modalCopy').classList.add('on');closeSet()}
 function updCopyView(){document.getElementById('copyPreview').value=copyChunks[copyIdx];document.getElementById('copyChunk').textContent=copyChunks[copyIdx].length+' karakter';document.getElementById('copyPg').textContent=(copyIdx+1)+'/'+copyChunks.length}
@@ -1284,7 +1430,7 @@ function fsExit(){pseudoFS=false;exitNative();applyFSState();setTimeout(layoutPr
 function togFsMenu(){document.getElementById('fsMenu').classList.toggle('show')}
 function devDims(){var w=curDev.w,h=curDev.h;if(orient==='h')return[Math.max(w,h),Math.min(w,h)];if(orient==='v')return[Math.min(w,h),Math.max(w,h)];return[w,h]}
 function isLand(){var d=devDims();return d[0]>=d[1]}
-function doRun(){clFind();pvOpen=true;document.body.classList.add('preview');reloadPreview()}
+function doRun(){if(welcomeOn){toast('Buka / buat file dulu');return}clFind();pvOpen=true;document.body.classList.add('preview');reloadPreview()}
 function reloadPreview(){if(pvUrl)URL.revokeObjectURL(pvUrl);pvUrl=URL.createObjectURL(new Blob([ed.getValue()],{type:'text/html'}));document.getElementById('prevFrame').src=pvUrl;layoutPreview();toast('Preview dijalankan')}
 function closePreview(){pvOpen=false;pseudoFS=false;exitNative();document.body.classList.remove('preview');document.body.classList.remove('fs');document.getElementById('fsMenu').classList.remove('show');document.getElementById('prevFrame').src='about:blank';if(pvUrl){URL.revokeObjectURL(pvUrl);pvUrl=''}fixH()}
 function layoutPreview(){
@@ -1311,7 +1457,15 @@ function togZoom(){zoomMode=!zoomMode;layoutPreview();toast(zoomMode?'Zoom 1:1 A
 function openDevModal(){renderDevList();document.getElementById('devModal').classList.add('on')}
 function closeDevModal(){document.getElementById('devModal').classList.remove('on')}
 function renderDevList(){var html='';DEVICES.forEach(function(g,gi){html+='<div class="dev-cat" style="border-color:'+g.color+';background:'+g.color+'22;color:'+g.color+'">'+g.icon+g.cat+'</div>';g.items.forEach(function(it,ii){var sel=it[0]===curDev.name;html+='<div class="dev-item'+(sel?' sel':'')+'" onclick="pickDevIdx('+gi+','+ii+')"><span>'+it[0]+'</span><span>'+it[1]+'×'+it[2]+(sel?' ✓':'')+'</span></div>'})});document.getElementById('devList').innerHTML=html}
-function pickDevIdx(gi,ii){var it=DEVICES[gi].items[ii];curDev={name:it[0],w:it[1],h:it[2]};orient=null;closeDevModal();layoutPreview();toast('Device: '+it[0])}
+function pickDevIdx(gi,ii){
+  var it=DEVICES[gi].items[ii];
+  curDev={name:it[0],w:it[1],h:it[2]};
+  localStorage.setItem(DEVKEY,JSON.stringify(curDev));
+  orient=null;
+  closeDevModal();
+  layoutPreview();
+  toast('Device: '+it[0]+' (tersimpan)');
+}
 function pvShot(){try{var doc=document.getElementById('prevFrame').contentDocument;if(!doc||!doc.body||typeof html2canvas==='undefined')throw 0;html2canvas(doc.body,{useCORS:true,logging:false,scale:1}).then(function(c){var a=document.createElement('a');a.download='screenshot-'+Date.now()+'.png';a.href=c.toDataURL('image/png');a.click();toast('Screenshot '+c.width+'×'+c.height+' tersimpan!')}).catch(function(){toast('Shot gagal')})}catch(e){toast('Shot tidak didukung')}}
 
 function clModal(id){document.getElementById(id).classList.remove('on')}
@@ -1325,12 +1479,17 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){clFind();clModal('modalNew');clModal('modalRename');clModal('modalCopy');clModal('modalConfirm');clModal('modalClose');clModal('modalAbout');closeDevModal();closeSet()}
 });
 
-window.addEventListener('beforeunload',function(){if(ed)draftSet(curFile,ed.getValue())});
+window.addEventListener('beforeunload',function(){if(ed&&!welcomeOn)draftSet(curFile,ed.getValue())});
 
+// ===== BOOT =====
 bootLastFile();
+getReg(); // sembuhkan registry duplikat
+var startWelcome=!localStorage.getItem(LASTKEY)&&getReg().length===0;
+if(startWelcome){openF=[];welcomeOn=true;document.body.classList.add('welcome');}
 if(curFile!=='index.html'||openF.length!==1)rebuildTabs();
 renderFiles();
 initEditor();
+if(startWelcome)renderWelcomeRecent();
 setTimeout(fixH,150);
 </script>
 </body>
