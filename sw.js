@@ -1,115 +1,85 @@
-// ============================================
-// SERVICE WORKER - Dompet Rantau
-// ============================================
-const CACHE_VERSION = 'dr-cache-v3.20.0';
-const APP_SHELL = [
+/* NR Editor - Service Worker */
+const VERSION = '1.7.4';
+const CACHE = 'nre-' + VERSION;
+const CORE = [
   './',
   './index.html',
+  './manifest.json',
+  './manifest.webmanifest',
+  './version.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
-// INSTALL: Cache app shell
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_VERSION).then(cache => {
-      return cache.addAll(APP_SHELL).catch(err => {
-        console.log('SW: gagal cache beberapa asset', err);
+/* Install: precache app shell (file yang ga ada dilewat aman) */
+self.addEventListener('install', function(e){
+  e.waitUntil(
+    caches.open(CACHE).then(function(c){
+      return Promise.all(CORE.map(function(u){
+        return c.add(u).catch(function(){ return null; });
+      }));
+    }).then(function(){
+      return self.skipWaiting();
+    })
+  );
+});
+
+/* Activate: buang cache versi lama, klaim client, kabari app */
+self.addEventListener('activate', function(e){
+  e.waitUntil(
+    caches.keys().then(function(keys){
+      return Promise.all(keys.filter(function(k){ return k !== CACHE; }).map(function(k){ return caches.delete(k); }));
+    }).then(function(){
+      return self.clients.claim();
+    }).then(function(){
+      return self.clients.matchAll().then(function(clients){
+        clients.forEach(function(cl){
+          cl.postMessage({ type: 'sw-updated', version: VERSION });
+        });
       });
     })
   );
-  self.skipWaiting(); // langsung aktifin, ga usah nunggu
 });
 
-// ACTIVATE: Bersihkan cache versi lama
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.filter(key => key !== CACHE_VERSION).map(key => caches.delete(key))
-      );
+/* Pesan dari app (misal paksa skip waiting) */
+self.addEventListener('message', function(e){
+  if (e.data && e.data.type === 'skip-waiting') { self.skipWaiting(); }
+});
+
+self.addEventListener('fetch', function(e){
+  var req = e.request;
+  if (req.method !== 'GET') return;
+  var url = new URL(req.url);
+
+  /* Same-origin (file app): NETWORK-FIRST biar update GitHub Pages langsung kepake, fallback cache kalau offline */
+  if (url.origin === location.origin) {
+    e.respondWith(
+      fetch(req).then(function(res){
+        if (res && res.ok) {
+          var copy = res.clone();
+          caches.open(CACHE).then(function(c){ c.put(req, copy); });
+        }
+        return res;
+      }).catch(function(){
+        return caches.match(req).then(function(hit){
+          return hit || caches.match('./index.html');
+        });
+      })
+    );
+    return;
+  }
+
+  /* Cross-origin (CDN CodeMirror dll): CACHE-FIRST biar hemat kuota & bisa offline */
+  e.respondWith(
+    caches.match(req).then(function(hit){
+      if (hit) return hit;
+      return fetch(req).then(function(res){
+        if (res && (res.ok || res.type === 'opaque')) {
+          var copy = res.clone();
+          caches.open(CACHE).then(function(c){ c.put(req, copy); });
+        }
+        return res;
+      });
     })
   );
-  self.clients.claim();
-});
-
-// FETCH: Strategi hybrid
-self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
-  
-  const url = new URL(event.request.url);
-  const isSameOrigin = url.origin === location.origin;
-  
-  // 1. version.json - network only (buat check update)
-  if (url.pathname.endsWith('version.json')) {
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        return new Response(JSON.stringify({ version: null }), {
-          headers: { 'Content-Type': 'application/json' }
-        });
-      })
-    );
-    return;
-  }
-  
-  // 2. Google Fonts - Cache first dengan update di background
-  if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
-    event.respondWith(
-      caches.open(CACHE_VERSION).then(cache => {
-        return cache.match(event.request).then(cached => {
-          const fetchPromise = fetch(event.request).then(response => {
-            if (response && response.status === 200) {
-              cache.put(event.request, response.clone());
-            }
-            return response;
-          }).catch(() => cached); // kalau offline, pake cached
-          return cached || fetchPromise;
-        });
-      })
-    );
-    return;
-  }
-  
-  // 3. App shell & static assets - Cache first
-  if (isSameOrigin) {
-    event.respondWith(
-      caches.match(event.request).then(cached => {
-        return cached || fetch(event.request).then(response => {
-          // Cache asset baru yang belum ada di cache
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(CACHE_VERSION).then(cache => {
-              cache.put(event.request, clone);
-            });
-          }
-          return response;
-        }).catch(() => {
-          // Kalau gagal network & ga ada cache, fallback ke index.html (buat navigation)
-          if (event.request.destination === 'document') {
-            return caches.match('./index.html');
-          }
-          return new Response('Offline', { status: 503 });
-        });
-      })
-    );
-    return;
-  }
-  
-  // 4. Request eksternal lain - network first, fallback ke cache
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        if (response && response.status === 200) {
-          const clone = response.clone();
-          caches.open(CACHE_VERSION).then(cache => cache.put(event.request, clone));
-        }
-        return response;
-      })
-      .catch(() => caches.match(event.request))
-  );
-});
-
-// Message handler buat update manual
-self.addEventListener('message', event => {
-  if (event.data === 'skipWaiting') {
-    self.skipWaiting();
-  }
 });
