@@ -1,5 +1,5 @@
 /* NR Editor - Service Worker */
-const VERSION = '1.7.4';
+const VERSION = '1.7.7';
 const CACHE = 'nre-' + VERSION;
 const CORE = [
   './',
